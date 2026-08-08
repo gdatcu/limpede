@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/lesson_catalog.dart';
 import '../providers/auth_provider.dart';
+import '../providers/settings_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../providers/user_provider.dart';
 import '../widgets/widgets.dart';
@@ -74,6 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userProfileAsync = ref.watch(currentUserProfileProvider);
     final dueCountAsync = ref.watch(dueSrsCountProvider);
     final completedTopicsAsync = ref.watch(completedTopicsProvider);
+    final updateInfoAsync = ref.watch(appUpdateInfoProvider);
 
     final completedSet = completedTopicsAsync.maybeWhen(
       data: (set) => set,
@@ -84,7 +86,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       targetLanguage: _selectedLanguage,
       completedTopics: completedSet,
     );
-
 
     final dueCount = dueCountAsync.maybeWhen(
       data: (count) => count,
@@ -184,6 +185,86 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: CustomScrollView(
         slivers: [
+          // Update Available Banner (GitHub Release Auto-Update)
+          if (updateInfoAsync.asData?.value != null &&
+              updateInfoAsync.asData!.value.hasUpdate) ...[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.purple.shade700, Colors.deepPurple.shade900],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.purple.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.system_update_rounded, color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Update Available! (v${updateInfoAsync.asData!.value.latestVersion})',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Tap to download the latest APK directly from GitHub.',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          final url = updateInfoAsync.asData!.value.downloadUrl;
+                          if (url != null) {
+                            ref.read(updateServiceProvider).launchUpdateUrl(url);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text('Update APK', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+
+
           // SRS Daily Review Card
           SliverToBoxAdapter(
             child: Padding(
@@ -313,7 +394,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-
 
           // Duolingo Skill Tree Units
           for (final unit in units) ...[

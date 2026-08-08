@@ -6,6 +6,40 @@ part of 'settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$updateServiceHash() => r'fedb516662068a9f42c6c1052bce6d04cc1d749c';
+
+/// See also [updateService].
+@ProviderFor(updateService)
+final updateServiceProvider = AutoDisposeProvider<UpdateService>.internal(
+  updateService,
+  name: r'updateServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$updateServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UpdateServiceRef = AutoDisposeProviderRef<UpdateService>;
+String _$appUpdateInfoHash() => r'b7fffed0dda778aba9f7e32503012071e8531a9c';
+
+/// See also [appUpdateInfo].
+@ProviderFor(appUpdateInfo)
+final appUpdateInfoProvider = AutoDisposeFutureProvider<AppUpdateInfo>.internal(
+  appUpdateInfo,
+  name: r'appUpdateInfoProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appUpdateInfoHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AppUpdateInfoRef = AutoDisposeFutureProviderRef<AppUpdateInfo>;
 String _$soundSettingsNotifierHash() =>
     r'1f97c722a6a885351bccb1689a177fec91f1547e';
 
