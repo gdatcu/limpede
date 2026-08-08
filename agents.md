@@ -39,3 +39,8 @@
 1.  **Models & Schema:** Define `freezed` Dart models for deterministic content (`SentencePair`, `SrsItem`).
 2.  **Engine & Providers:** Implement local SRS scheduling logic and Supabase fetch repositories wrapped in Riverpod providers.
 3.  **UI Integration:** Connect screens to SRS providers and wire up the optional "Explain My Mistake" AI sheet on result screens.
+
+## 6. Documentation & Release Maintenance Protocol
+*   **Continuous Maintenance:** Whenever a new feature, bug fix, or architectural modification is added, you MUST update `README.md` and append/update an entry in `RELEASE_NOTES.md` under the version header (`## [vX.Y.Z] - YYYY-MM-DD`).
+*   **Release Version Tags:** Release tags follow semantic versioning `vX.Y.Z` (e.g., `v1.0.0`, `v1.0.1`). Pushing a tag matching `v*` triggers the automated GitHub Release CI/CD workflow (`.github/workflows/release.yml`) which builds `app-release.apk` and publishes it to GitHub Releases.
+*   **Security & Secrets:** Never commit `.env` or generated secret files (`env_service.g.dart`). Maintain `.env.example` as a template for team members.
