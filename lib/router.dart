@@ -26,12 +26,13 @@ final GoRouter router = GoRouter(
   ),
   redirect: (BuildContext context, GoRouterState state) {
     final session = Supabase.instance.client.auth.currentSession;
-    final isLoggingIn = state.matchedLocation == '/login';
+    final location = state.matchedLocation;
+    final isAuthProcessing = location == '/login' || location.contains('login-callback');
 
-    if (session == null && !isLoggingIn) {
+    if (session == null && !isAuthProcessing) {
       return '/login';
     }
-    if (session != null && isLoggingIn) {
+    if (session != null && isAuthProcessing) {
       return '/';
     }
     return null;
@@ -47,6 +48,16 @@ final GoRouter router = GoRouter(
       path: '/login',
       builder: (BuildContext context, GoRouterState state) {
         return const LoginScreen();
+      },
+    ),
+    GoRoute(
+      path: '/login-callback',
+      builder: (BuildContext context, GoRouterState state) {
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
       },
     ),
     GoRoute(

@@ -4,6 +4,15 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.3] - 2026-08-09
+
+### 🐛 OAuth Redirect & Deep Link Loop Fix
+
+#### 🔐 GoRouter Auth Callback Route
+- **Fixed OAuth Loop / Redirection to Login**: Added explicit `/login-callback` route handling in `GoRouter` (`router.dart`) and updated auth redirect guards so incoming OAuth deep links (`io.supabase.limpede://login-callback/`) are recognized as active authentication states while session tokens are parsed and persisted.
+
+---
+
 ## [v1.0.2] - 2026-08-09
 
 ### 🌐 Multi-Language Expansion & Database Quota Optimization
