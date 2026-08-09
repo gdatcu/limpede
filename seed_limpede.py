@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import uuid
 import pandas as pd
 from supabase import create_client, Client
@@ -63,32 +64,39 @@ def seed_database():
     df = pd.read_csv(file_path, sep='\t', header=None, names=['source_text', 'target_text', 'attribution'], usecols=[0, 1])
     
     total_rows = len(df)
-    print(f"Loaded {total_rows} sentence pairs. Preparing bulk insert...")
+    print(f"Loaded {total_rows} sentence pairs. Structuring data...")
 
-    # Calculate how many chunks we need
-    chunks = [df[i:i + CHUNK_SIZE] for i in range(0, total_rows, CHUNK_SIZE)]
+    all_pairs = []
+    for idx, row in df.iterrows():
+        all_pairs.append({
+            "id": f"tatoeba_{TARGET_LANGUAGE_CODE}_{idx + 1:06d}",
+            "source_text": str(row['source_text']).strip(),
+            "target_text": str(row['target_text']).strip(),
+            "language_code": TARGET_LANGUAGE_CODE,
+            "difficulty_level": "B1",
+            "topic_category": "General Vocabulary"
+        })
+
+    # Save to local offline catalog JSON for Flutter
+    assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+    os.makedirs(assets_dir, exist_ok=True)
+    json_path = os.path.join(assets_dir, f"tatoeba_{TARGET_LANGUAGE_CODE}_catalog.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(all_pairs, f, ensure_ascii=False, indent=2)
+    print(f"[OK] Saved {len(all_pairs)} sentence pairs to offline local catalog: {json_path}")
+
+    # Calculate how many chunks we need for Supabase insert
+    chunks = [all_pairs[i:i + CHUNK_SIZE] for i in range(0, total_rows, CHUNK_SIZE)]
     
     total_inserted = 0
     rls_error_detected = False
     
+    print("Blasting sentence pairs into Supabase database...")
     for index, chunk in enumerate(chunks):
-        # Format the chunk to match our Supabase schema exactly
-        payload = []
-        for _, row in chunk.iterrows():
-            payload.append({
-                "id": f"tatoeba_{TARGET_LANGUAGE_CODE}_{uuid.uuid4().hex[:10]}",
-                "source_text": str(row['source_text']).strip(),
-                "target_text": str(row['target_text']).strip(),
-                "language_code": TARGET_LANGUAGE_CODE,
-                "difficulty_level": "B1", # Defaulting to B1, you can run a script to classify later
-                "topic_category": "General Vocabulary"
-            })
-            
-        # Push chunk to Supabase using upsert
-        print(f"Pushing chunk {index + 1}/{len(chunks)} ({len(payload)} rows)...")
+        print(f"Pushing chunk {index + 1}/{len(chunks)} ({len(chunk)} rows)...")
         try:
-            response = supabase.table("sentence_pairs").upsert(payload).execute()
-            total_inserted += len(payload)
+            response = supabase.table("sentence_pairs").upsert(chunk).execute()
+            total_inserted += len(chunk)
         except Exception as e:
             err_str = str(e)
             print(f"Notice inserting chunk {index + 1}: {err_str}")
@@ -96,20 +104,22 @@ def seed_database():
                 rls_error_detected = True
             
     if total_inserted > 0:
-        print(f"[OK] Success! Inserted {total_inserted} sentences into Limpede database.")
+        print(f"[OK] Success! Inserted {total_inserted} sentences directly into Supabase database.")
     elif rls_error_detected:
-        print("\n--------------------------------------------------------------------------------")
-        print("⚠️  Row Level Security (RLS) Notice:")
-        print("Inserting into 'sentence_pairs' was blocked by Supabase RLS policy.")
-        print("To allow seeding:")
-        print("1. Set SUPABASE_SERVICE_ROLE_KEY in your .env file or environment.")
-        print("OR")
-        print("2. Run the following SQL policy in your Supabase SQL Editor:")
-        print("   CREATE POLICY \"Public sentence pairs are viewable and manageable\"")
-        print("       ON sentence_pairs FOR ALL USING (true) WITH CHECK (true);")
-        print("--------------------------------------------------------------------------------\n")
+        print("\n" + "="*80)
+        print("⚡ LOCAL CATALOG READY & SUPABASE RLS INSTRUCTIONS:")
+        print(f"1. All {len(all_pairs)} sentence pairs were generated & saved locally at:\n   {json_path}")
+        print("2. To blast these records directly into remote Supabase database:")
+        print("   - Copy your SUPABASE_SERVICE_ROLE_KEY from Supabase Dashboard -> Settings -> API")
+        print("   - Add it to your .env file: SUPABASE_SERVICE_ROLE_KEY=ey...")
+        print("   - Or run this SQL in Supabase SQL Editor:")
+        print("     DROP POLICY IF EXISTS \"Public sentence pairs viewable by everyone\" ON sentence_pairs;")
+        print("     DROP POLICY IF EXISTS \"Public sentence pairs are viewable and manageable\" ON sentence_pairs;")
+        print("     CREATE POLICY \"Public sentence pairs are viewable and manageable\"")
+        print("         ON sentence_pairs FOR ALL USING (true) WITH CHECK (true);")
+        print("="*80 + "\n")
     
-    # Cleanup downloaded file
+    # Cleanup downloaded temp txt file
     if os.path.exists(file_path):
         os.remove(file_path)
 

@@ -40,12 +40,14 @@ ALTER TABLE srs_review_items ENABLE ROW LEVEL SECURITY;
 
 -- 5. RLS Policies
 -- Allow anyone (authenticated or guest) to read sentence pairs and seed new pairs
+DROP POLICY IF EXISTS "Public sentence pairs viewable by everyone" ON sentence_pairs;
+DROP POLICY IF EXISTS "Public sentence pairs are viewable and manageable" ON sentence_pairs;
 CREATE POLICY "Public sentence pairs are viewable and manageable" 
     ON sentence_pairs FOR ALL 
     USING (true) 
     WITH CHECK (true);
 
--- Allow users to manage their own SRS review records
+DROP POLICY IF EXISTS "Users can manage their own SRS review items" ON srs_review_items;
 CREATE POLICY "Users can manage their own SRS review items" 
     ON srs_review_items FOR ALL 
     USING (auth.uid() = user_id) 
