@@ -82,14 +82,17 @@ class SupabaseService {
     try {
       final code = LessonCatalog.normalizeLanguageCode(languageCode ?? 'es');
       var query = _client.from('sentence_pairs').select().eq('language_code', code);
-      if (topicCategory.isNotEmpty && topicCategory != 'All Topics' && topicCategory != 'General Vocabulary') {
+      if (topicCategory.isNotEmpty &&
+          topicCategory != 'All Topics' &&
+          topicCategory != 'General Vocabulary' &&
+          topicCategory != 'Advanced Fluency') {
         query = query.eq('topic_category', topicCategory);
       }
       final response = await query.limit(50);
       List<dynamic> data = response as List<dynamic>;
 
       if (data.isEmpty) {
-        // Fallback to querying any available pairs for this language from the seeded dataset
+        // Query sentence pairs for this language from the 1.9M dataset
         final fallbackResponse = await _client
             .from('sentence_pairs')
             .select()

@@ -4,6 +4,16 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.4] - 2026-08-09
+
+### 🚀 Unit 5 Mastery & 1.9M Dataset Skill Tree Expansion
+
+#### 📚 Dynamic Mastery Units
+- **Added Unit 5 (Mastery & General Vocabulary)**: Created a new course unit in `LessonCatalog` featuring *General Vocabulary* and *Advanced Fluency* nodes designed to unlock the full 1.9M+ sentence dataset across all supported languages.
+- **Dynamic Supabase Dataset Integration**: Updated `SupabaseService.fetchSentencePairs()` to query and serve sentence pairs directly from the 1.9M+ database records when practicing general vocabulary and advanced fluency.
+
+---
+
 ## [v1.0.3] - 2026-08-09
 
 ### 🐛 OAuth Redirect & Deep Link Loop Fix

@@ -518,6 +518,35 @@ class LessonCatalog {
           ),
         ],
       ),
+      CourseUnit(
+        id: 'unit_5',
+        unitNumber: 5,
+        title: 'Mastery & General Vocabulary',
+        description: 'Explore the 1.9M+ sentence bank for complete conversational fluency.',
+        levelBadge: 'B1 / B2 Fluency',
+        lessons: [
+          LessonNode(
+            id: 'u5_l1',
+            title: 'General Vocabulary',
+            description: 'Core phrases, idioms & everyday sentence pairs',
+            level: 'B1',
+            status: LessonNodeStatus.locked,
+            xpReward: 50,
+            topic: 'General Vocabulary',
+            targetLanguage: targetLanguage,
+          ),
+          LessonNode(
+            id: 'u5_l2',
+            title: 'Advanced Fluency',
+            description: 'Complex sentence structures & natural dialogue',
+            level: 'B2',
+            status: LessonNodeStatus.locked,
+            xpReward: 50,
+            topic: 'Advanced Fluency',
+            targetLanguage: targetLanguage,
+          ),
+        ],
+      ),
     ];
 
     bool unlockedNextActive = false;
