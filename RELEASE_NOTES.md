@@ -4,6 +4,15 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.5] - 2026-08-09
+
+### 🐛 Mobile OAuth Diagnostics & SnackBar Error Messaging
+
+#### 🔐 Login Error Handling & Indicator
+- **Enhanced `LoginScreen` (`login_screen.dart`)**: Added interactive loading state indicators during OAuth initiation and explicit SnackBar error message popups (`Google Sign-In Notice`, `Discord Sign-In Notice`) so any provider/client configuration errors are visibly surfaced.
+
+---
+
 ## [v1.0.4] - 2026-08-09
 
 ### 🚀 Unit 5 Mastery & 1.9M Dataset Skill Tree Expansion
