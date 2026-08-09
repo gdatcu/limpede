@@ -130,7 +130,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
                     DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
                     DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
-                    DropdownMenuItem(value: 'Turkish', child: Text('🇹🇷 Turkish')),
                   ],
                   onChanged: (val) {
                     if (val != null) {
