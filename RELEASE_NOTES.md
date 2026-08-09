@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.1] - 2026-08-09
+
+### 🐛 Bug Fixes & OAuth Improvements
+
+#### 🔐 Supabase OAuth Login & CI Build Environment
+- **Fixed `your-supabase-project.supabase.co` DNS Error**: Updated `.env.example` and GitHub Actions release workflow (`release.yml`) to inject active Supabase project credentials (or GitHub secrets `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `GEMINI_API_KEY`) during APK compilation, eliminating invalid placeholder URL generation in release builds.
+- **Android Deep Link Integration**: Added `io.supabase.limpede://login-callback/` deep link `intent-filter` into `AndroidManifest.xml` so Android properly redirects back to Limpede after Google and Discord web OAuth login.
+
+#### 🎨 Custom Android Launcher Icon
+- **High-Resolution App Launcher Icon**: Added `flutter_launcher_icons` and generated multi-density Android mipmap icons (`hdpi`, `mdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`) featuring the official Limpede emblem (violet & cyan glowing speech bubble with crystal spark).
+
+---
+
 ## [v1.0.0] - 2026-08-08
 
 ### 🎉 Initial Public Release
