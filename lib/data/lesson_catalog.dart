@@ -3,19 +3,25 @@ import '../models/lesson_block.dart';
 import '../models/srs_models.dart';
 
 class LessonCatalog {
+  static String normalizeLanguageCode(String targetLanguage) {
+    final lang = targetLanguage.trim().toLowerCase();
+    if (lang == 'es' || lang.contains('spanish')) return 'es';
+    if (lang == 'fr' || lang.contains('french')) return 'fr';
+    if (lang == 'de' || lang.contains('german')) return 'de';
+    if (lang == 'it' || lang.contains('italian')) return 'it';
+    if (lang == 'ro' || lang.contains('romanian')) return 'ro';
+    if (lang == 'pt' || lang.contains('portuguese')) return 'pt';
+    if (lang == 'ru' || lang.contains('russian')) return 'ru';
+    if (lang == 'ja' || lang.contains('japanese')) return 'ja';
+    if (lang == 'tr' || lang.contains('turkish')) return 'tr';
+    return lang;
+  }
+
   static List<SentencePair> getSentencePairs({
     required String topic,
     String targetLanguage = 'Spanish',
   }) {
-    final lang = targetLanguage.trim().toLowerCase();
-    final langCode = lang.contains('french')
-        ? 'fr'
-        : lang.contains('german')
-            ? 'de'
-            : lang.contains('japanese')
-                ? 'ja'
-                : 'es';
-
+    final langCode = normalizeLanguageCode(targetLanguage);
     final t = topic.trim().toLowerCase();
 
     if (langCode == 'es') {

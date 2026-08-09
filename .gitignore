@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 lib/services/env_service.g.dart
+assets/tatoeba_*_catalog.json
+_about.txt
+
 
 # Miscellaneous
 *.class

@@ -125,7 +125,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
                     DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
                     DropdownMenuItem(value: 'German', child: Text('🇩🇪 German')),
+                    DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
+                    DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Romanian')),
+                    DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
+                    DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
                     DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
+                    DropdownMenuItem(value: 'Turkish', child: Text('🇹🇷 Turkish')),
                   ],
                   onChanged: (val) {
                     if (val != null) {

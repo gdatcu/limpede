@@ -80,12 +80,24 @@ class SupabaseService {
     String? languageCode,
   }) async {
     try {
-      var query = _client.from('sentence_pairs').select().eq('topic_category', topicCategory);
-      if (languageCode != null && languageCode.isNotEmpty) {
-        query = query.eq('language_code', languageCode);
+      final code = LessonCatalog.normalizeLanguageCode(languageCode ?? 'es');
+      var query = _client.from('sentence_pairs').select().eq('language_code', code);
+      if (topicCategory.isNotEmpty && topicCategory != 'All Topics' && topicCategory != 'General Vocabulary') {
+        query = query.eq('topic_category', topicCategory);
       }
-      final response = await query;
-      final List<dynamic> data = response as List<dynamic>;
+      final response = await query.limit(50);
+      List<dynamic> data = response as List<dynamic>;
+
+      if (data.isEmpty) {
+        // Fallback to querying any available pairs for this language from the seeded dataset
+        final fallbackResponse = await _client
+            .from('sentence_pairs')
+            .select()
+            .eq('language_code', code)
+            .limit(50);
+        data = fallbackResponse as List<dynamic>;
+      }
+
       if (data.isNotEmpty) {
         return data.map((j) => SentencePair.fromJson(j as Map<String, dynamic>)).toList();
       }

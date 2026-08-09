@@ -33,17 +33,11 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SU
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 CHUNK_SIZE = 5000 
 
-# 2. Comprehensive Target Datasets for All Supported Languages
+# 2. Target Datasets (Targeting Spanish, French, Portuguese)
 DATASETS = [
-    {"name": "Spanish",   "code": "es", "url": "https://www.manythings.org/anki/spa-eng.zip"},
-    {"name": "French",    "code": "fr", "url": "https://www.manythings.org/anki/fra-eng.zip"},
-    {"name": "German",    "code": "de", "url": "https://www.manythings.org/anki/deu-eng.zip"},
-    {"name": "Italian",   "code": "it", "url": "https://www.manythings.org/anki/ita-eng.zip"},
-    {"name": "Romanian",  "code": "ro", "url": "https://www.manythings.org/anki/ron-eng.zip"},
-    {"name": "Portuguese","code": "pt", "url": "https://www.manythings.org/anki/por-eng.zip"},
-    {"name": "Russian",   "code": "ru", "url": "https://www.manythings.org/anki/rus-eng.zip"},
-    {"name": "Japanese",  "code": "ja", "url": "https://www.manythings.org/anki/jpn-eng.zip"},
-    {"name": "Turkish",   "code": "tr", "url": "https://www.manythings.org/anki/tur-eng.zip"}
+    {"name": "Spanish",    "code": "es", "url": "https://www.manythings.org/anki/spa-eng.zip"},
+    {"name": "French",     "code": "fr", "url": "https://www.manythings.org/anki/fra-eng.zip"},
+    {"name": "Portuguese", "code": "pt", "url": "https://www.manythings.org/anki/por-eng.zip"}
 ]
 
 def process_language(dataset):
@@ -56,7 +50,11 @@ def process_language(dataset):
     r.raise_for_status()
     z = zipfile.ZipFile(io.BytesIO(r.content))
     
-    tsv_filename = [name for name in z.namelist() if name.endswith('.txt') and 'readme' not in name.lower()][0]
+    # Filter out metadata files like _about.txt or readme.txt
+    tsv_filename = [
+        name for name in z.namelist() 
+        if name.endswith('.txt') and not os.path.basename(name).startswith('_') and 'readme' not in name.lower() and 'about' not in name.lower()
+    ][0]
     z.extract(tsv_filename, path=".")
     
     # Load into memory
@@ -113,4 +111,4 @@ if __name__ == "__main__":
         except Exception as err:
             print(f"Error processing {dataset['name']}: {err}")
             
-    print(f"\n🎉 ALL DONE! Grand total inserted: {grand_total} sentences across {len(DATASETS)} languages into Limpede!")
+    print(f"\n🎉 ALL DONE! Grand total inserted: {grand_total} sentences across Spanish, French, and Portuguese into Limpede!")

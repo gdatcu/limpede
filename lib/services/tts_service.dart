@@ -19,19 +19,16 @@ class TtsService {
 
   String _getLanguageCode(String targetLanguage) {
     final lang = targetLanguage.trim().toLowerCase();
-    if (lang.contains('spanish') || lang.contains('es')) {
-      return 'es-ES';
-    } else if (lang.contains('french') || lang.contains('fr')) {
-      return 'fr-FR';
-    } else if (lang.contains('german') || lang.contains('de')) {
-      return 'de-DE';
-    } else if (lang.contains('japanese') || lang.contains('ja')) {
-      return 'ja-JP';
-    } else if (lang.contains('romanian') || lang.contains('ro')) {
-      return 'ro-RO';
-    } else {
-      return 'en-US';
-    }
+    if (lang.contains('spanish') || lang == 'es') return 'es-ES';
+    if (lang.contains('french') || lang == 'fr') return 'fr-FR';
+    if (lang.contains('german') || lang == 'de') return 'de-DE';
+    if (lang.contains('italian') || lang == 'it') return 'it-IT';
+    if (lang.contains('romanian') || lang == 'ro') return 'ro-RO';
+    if (lang.contains('portuguese') || lang == 'pt') return 'pt-PT';
+    if (lang.contains('russian') || lang == 'ru') return 'ru-RU';
+    if (lang.contains('japanese') || lang == 'ja') return 'ja-JP';
+    if (lang.contains('turkish') || lang == 'tr') return 'tr-TR';
+    return 'en-US';
   }
 
   Future<void> speak({
