@@ -4,6 +4,21 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.2] - 2026-08-09
+
+### 🌐 Multi-Language Expansion & Database Quota Optimization
+
+#### 🌍 8 Active Target Languages
+- **Expanded App Language Selection**: Added 8 active target languages with flag indicators in the main header dropdown (`home_screen.dart`): 🇪🇸 Spanish, 🇫🇷 French, 🇩🇪 German, 🇮🇹 Italian, 🇷🇴 Romanian, 🇵🇹 Portuguese, 🇷🇺 Russian, 🇯🇵 Japanese.
+- **Dynamic Supabase Dataset Integration**: Updated `SupabaseService.fetchSentencePairs()` with normalized language codes (`es`, `fr`, `de`, `it`, `ro`, `pt`, `ru`, `ja`) and automatic dataset querying from over 1.2 million PostgreSQL sentence pair records.
+- **Multi-Language TTS Audio**: Updated `TtsService` to support native speech pronunciations for all active target languages (`es-ES`, `fr-FR`, `de-DE`, `it-IT`, `ro-RO`, `pt-PT`, `ru-RU`, `ja-JP`).
+
+#### 🛠️ Dataset Seeding & Database Footprint
+- **Multi-Language Dataset Seeder (`seed_limpede.py`)**: Enhanced automated seeding script with `.env` auto-loading, browser User-Agent headers, UTF-8 logging, idempotent upserting, and RLS policy handling.
+- **Database Quota Optimization**: Optimized language footprint to maintain database size well within Supabase's 500 MB free quota tier.
+
+---
+
 ## [v1.0.1] - 2026-08-09
 
 ### 🐛 Bug Fixes & OAuth Improvements
