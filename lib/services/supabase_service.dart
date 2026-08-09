@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/lesson_catalog.dart';
@@ -186,6 +187,36 @@ class SupabaseService {
 
   Future<bool> signInWithGoogle() async {
     try {
+      if (!kIsWeb) {
+        try {
+          final GoogleSignIn googleSignIn = GoogleSignIn(
+            scopes: ['email', 'profile'],
+          );
+          final googleUser = await googleSignIn.signIn();
+          if (googleUser != null) {
+            final googleAuth = await googleUser.authentication;
+            final idToken = googleAuth.idToken;
+            final accessToken = googleAuth.accessToken;
+
+            if (idToken != null) {
+              final res = await _client.auth.signInWithIdToken(
+                provider: OAuthProvider.google,
+                idToken: idToken,
+                accessToken: accessToken,
+              );
+              if (res.session != null) {
+                return true;
+              }
+            }
+          } else {
+            // User cancelled Google sign in dialog
+            return false;
+          }
+        } catch (e) {
+          debugPrint('Native Google sign-in notice: $e. Falling back to OAuth browser redirect.');
+        }
+      }
+
       const String redirectTo = kIsWeb
           ? 'http://localhost:5000/'
           : 'io.supabase.limpede://login-callback/';

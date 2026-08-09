@@ -4,6 +4,16 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.6] - 2026-08-09
+
+### 📱 Native Android Google Sign-In & ID Token Authentication
+
+#### 🔑 In-App Native Google Account Picker
+- **Native Android ID Token Authentication**: Integrated `google_sign_in` package to trigger the native Android Google Play Services account picker directly in-app.
+- **Zero Browser Redirect Loops**: Authenticates directly via `signInWithIdToken` without launching Chrome browser or relying on custom deep link URL redirects on mobile devices.
+
+---
+
 ## [v1.0.5] - 2026-08-09
 
 ### 🐛 Mobile OAuth Diagnostics & SnackBar Error Messaging
