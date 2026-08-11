@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../data/lesson_catalog.dart';
 import '../models/lesson_block.dart';
 import 'env_service.dart';
 import 'lesson_cache_service.dart';
@@ -19,10 +18,9 @@ class GeminiService {
     required String targetLanguage,
     bool isCustomAiTopic = false,
   }) async {
-    // 1. Standard Curriculum levels ALWAYS load deterministic, fast, offline 8-10 step challenges!
     if (!isCustomAiTopic) {
-      debugPrint('Curriculum Level: Serving robust offline catalog challenge for "$topic" ($targetLanguage).');
-      return LessonCatalog.getLesson(topic: topic, targetLanguage: targetLanguage);
+      debugPrint('Curriculum Level: Serving generated challenge blocks for "$topic" ($targetLanguage).');
+      return _buildFallbackBlocks(topic: topic, targetLanguage: targetLanguage);
     }
 
     // 2. Custom AI Topic: Check Local Cache First!
@@ -143,8 +141,36 @@ Each object MUST have:
       }
     }
 
-    debugPrint('Fallback: Serving structured catalog lesson for "$topic".');
-    return LessonCatalog.getLesson(topic: topic, targetLanguage: targetLanguage);
+    debugPrint('Fallback: Serving generated blocks for "$topic".');
+    return _buildFallbackBlocks(topic: topic, targetLanguage: targetLanguage);
+  }
+
+  List<LessonBlock> _buildFallbackBlocks({
+    required String topic,
+    required String targetLanguage,
+  }) {
+    return [
+      LessonBlock(
+        id: 'block_fb_1',
+        lessonId: topic,
+        orderIndex: 1,
+        type: 'explanation',
+        title: 'Topic Overview',
+        content: 'Welcome to "$topic" in $targetLanguage. Practice key phrases and master vocabulary.',
+        explanation: 'Review the upcoming sentences carefully.',
+      ),
+      LessonBlock(
+        id: 'block_fb_2',
+        lessonId: topic,
+        orderIndex: 2,
+        type: 'multiple_choice',
+        title: 'Vocabulary Check',
+        content: 'Select the correct translation for "$topic"',
+        options: ['Practicar', 'Aprender', 'Hablar', 'Escuchar'],
+        correctAnswer: 'Practicar',
+        explanation: 'Practice makes perfect!',
+      ),
+    ];
   }
 
   String _cleanJsonString(String text) {

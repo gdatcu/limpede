@@ -2,11 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../data/lesson_catalog.dart';
 import '../models/srs_models.dart';
 import '../providers/feedback_provider.dart';
 import '../providers/lesson_provider.dart';
 import '../providers/srs_lesson_provider.dart';
+import '../utils/language_utils.dart';
 import '../widgets/widgets.dart';
 
 class LessonScreen extends ConsumerStatefulWidget {
@@ -50,11 +50,6 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   void _generateOptions(SentencePair currentPair, List<SentencePair> deck) {
     if (_currentOptions.isNotEmpty) return;
 
-    final catalogPairs = LessonCatalog.getSentencePairs(
-      topic: widget.lessonId,
-      targetLanguage: widget.targetLanguage,
-    );
-
     final Set<String> optionsSet = {currentPair.targetText};
 
     // Add targetTexts from other items in deck
@@ -65,21 +60,8 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       if (optionsSet.length >= 4) break;
     }
 
-    // Add from catalog if needed
-    for (var p in catalogPairs) {
-      if (p.targetText != currentPair.targetText) {
-        optionsSet.add(p.targetText);
-      }
-      if (optionsSet.length >= 4) break;
-    }
-
-    // Add fallback options if needed
-    final fallbacks = [
-      'Gracias por la ayuda',
-      'Hasta luego amigo',
-      'Buenos días a todos',
-      'Por favor otra vez',
-    ];
+    // Add fallback options for the current target language
+    final fallbacks = LanguageUtils.getFallbackDistractors(widget.targetLanguage);
     for (var f in fallbacks) {
       if (optionsSet.length >= 4) break;
       if (f != currentPair.targetText) optionsSet.add(f);

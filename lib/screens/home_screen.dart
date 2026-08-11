@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../data/lesson_catalog.dart';
 import '../providers/auth_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/srs_lesson_provider.dart';
-import '../providers/user_provider.dart';
+import '../providers/topic_provider.dart';
 import '../widgets/widgets.dart';
 import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
@@ -31,6 +30,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       builder: (context) => const GenerateLessonSheet(),
     );
+  }
+
+  double _getSerpentineOffset(int index) {
+    const sequence = [0.0, -45.0, -25.0, 25.0, 45.0, 20.0, -35.0];
+    return sequence[index % sequence.length];
   }
 
   @override
@@ -74,18 +78,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final theme = Theme.of(context);
     final userProfileAsync = ref.watch(currentUserProfileProvider);
     final dueCountAsync = ref.watch(dueSrsCountProvider);
-    final completedTopicsAsync = ref.watch(completedTopicsProvider);
+    final topicUnitsAsync = ref.watch(topicUnitsProvider(targetLanguage: _selectedLanguage));
     final updateInfoAsync = ref.watch(appUpdateInfoProvider);
-
-    final completedSet = completedTopicsAsync.maybeWhen(
-      data: (set) => set,
-      orElse: () => <String>{},
-    );
-
-    final units = LessonCatalog.getCourseUnits(
-      targetLanguage: _selectedLanguage,
-      completedTopics: completedSet,
-    );
 
     final dueCount = dueCountAsync.maybeWhen(
       data: (count) => count,
@@ -268,7 +262,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
 
-
           // SRS Daily Review Card
           SliverToBoxAdapter(
             child: Padding(
@@ -399,99 +392,150 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Duolingo Skill Tree Units
-          for (final unit in units) ...[
-            SliverToBoxAdapter(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.tertiary,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
+          // Dynamic Duolingo Skill Tree Units
+          topicUnitsAsync.when(
+            loading: () => const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'UNIT ${unit.unitNumber}',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            unit.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                          Text(
-                            unit.description,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
+              ),
+            ),
+            error: (err, stack) => SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Center(
+                  child: Text(
+                    'Unable to load curriculum topics. Tap to retry.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        unit.levelBadge,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+            data: (units) {
+              if (units.isEmpty) {
+                return const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Center(child: Text('No topics available.')),
+                  ),
+                );
+              }
+
+              return SliverMainAxisGroup(
+                slivers: [
+                  for (final unit in units) ...[
+                    // Section Unit Header Card
+                    SliverToBoxAdapter(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              theme.colorScheme.primary,
+                              theme.colorScheme.tertiary,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'UNIT ${unit.unitNumber}',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      letterSpacing: 1.1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    unit.unitName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    unit.description,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Text(
+                                unit.levelBadge,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
 
-            // Serpentine Path Nodes for Unit Lessons
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final lessonNode = unit.lessons[index];
-                  final xOffset = (index % 2 == 0 ? -40.0 : 40.0) * (index % 3 == 1 ? 1.5 : 1.0);
+                    // Serpentine Path Nodes for Unit Lessons
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final topicNode = unit.nodes[index];
+                          final xOffset = _getSerpentineOffset(index);
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: SkillTreeNodeWidget(
-                      node: lessonNode,
-                      xOffset: xOffset,
-                      onTap: () {
-                        context.push(
-                          '/lesson/${Uri.encodeComponent(lessonNode.topic)}?language=$_selectedLanguage',
-                        );
-                      },
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: SkillTreeNodeWidget(
+                              node: topicNode,
+                              xOffset: xOffset,
+                              onTap: () {
+                                context.push(
+                                  '/lesson/${Uri.encodeComponent(topicNode.fullCategory)}?language=$_selectedLanguage',
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        childCount: unit.nodes.length,
+                      ),
                     ),
-                  );
-                },
-                childCount: unit.lessons.length,
-              ),
-            ),
-          ],
+                  ],
+                ],
+              );
+            },
+          ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          const SliverToBoxAdapter(child: SizedBox(height: 60)),
         ],
       ),
     );

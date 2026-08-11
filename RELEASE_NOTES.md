@@ -4,6 +4,36 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.8] - 2026-08-11
+
+### 🗺️ Dynamic Supabase Topic Path & Duolingo Serpentine Tree Migration
+
+#### 🗑️ Static Catalog Deprecation & Complete Removal
+- **Deleted Hardcoded `LessonCatalog` (`lesson_catalog.dart`)**: Removed static catalog fallback file and purged all project-wide imports across services, controllers, and screens.
+- **`LanguageUtils` Helper (`language_utils.dart`)**: Created reusable language code normalization and flag emoji helper replacing legacy catalog utility methods.
+
+#### 🗄️ Dynamic Topic Category Riverpod Provider (`topic_provider.dart`)
+- **Supabase Category Fetching**: Implemented `topicUnitsProvider` querying distinct `topic_category` entries from Supabase `sentence_pairs` table.
+- **Unit & Node Parsing**: Parses category strings by colon delimiter (`:`), mapping prefixes to `UnitName` and suffixes to `NodeName` (e.g. `"Food: Ordering a coffee or tea"`).
+- **Final Challenge Unit**: Dynamically isolates "General Vocabulary" topics and positions them at the very bottom as a final challenge boss unit.
+- **Contextual Playful Icons**: Dynamically assigns theme-appropriate Material 3 icons based on unit and topic keywords (e.g. waving hand for greetings, cafe for food/coffee, takeoff for travel).
+
+#### 📱 HomeScreen Serpentine Skill Tree UI
+- **Dynamic Duolingo Serpentine Path**: Rebuilt `HomeScreen` (`home_screen.dart`) with a CustomScrollView sliver layout displaying dynamic units and staggered S-curve node alignments using `SkillTreeNodeWidget`.
+- **Dynamic Microlesson Initializer**: Tapping any dynamic node initializes `SrsLessonController` with 10 sentences for the selected topic category mixed with due SRS review items.
+
+---
+
+## [v1.0.7] - 2026-08-10
+
+### 🐛 Semantic Categorizer Bulk Upsert & Database Constraint Fix
+
+#### 🧠 Semantic AI Categorization Tool (`semantic_categorizer.py`)
+- **Fixed PostgREST `23502` NOT NULL Constraint Error**: Resolved `null value in column "source_text" of relation "sentence_pairs" violates not-null constraint` error during bulk upsert by selecting and including required table fields (`source_text`, `target_text`, `language_code`, `difficulty_level`) in the update payload batch.
+- **Accurate Retry & Metrics Tracking**: Updated batch update runner so retry metrics strictly count confirmed database upserts.
+
+---
+
 ## [v1.0.6] - 2026-08-09
 
 ### 📱 Native Android Google Sign-In & ID Token Authentication

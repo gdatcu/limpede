@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../data/lesson_catalog.dart';
 import '../models/srs_models.dart';
 import '../models/user_profile.dart';
+import '../utils/language_utils.dart';
 
 class SupabaseService {
   final SupabaseClient _client;
@@ -76,12 +76,38 @@ class SupabaseService {
     }
   }
 
+  Future<List<String>> fetchTopicCategories({required String targetLanguage}) async {
+    final langCode = LanguageUtils.normalizeLanguageCode(targetLanguage);
+    try {
+      final response = await _client
+          .from('sentence_pairs')
+          .select('topic_category')
+          .eq('language_code', langCode);
+
+      final List<dynamic> data = response as List<dynamic>;
+      final Set<String> categories = {};
+      for (final row in data) {
+        final cat = row['topic_category'] as String?;
+        if (cat != null && cat.trim().isNotEmpty) {
+          categories.add(cat.trim());
+        }
+      }
+      if (categories.isNotEmpty) {
+        return categories.toList();
+      }
+    } catch (e) {
+      debugPrint('Notice fetching topic categories from Supabase: $e');
+    }
+    return [];
+  }
+
   Future<List<SentencePair>> fetchSentencePairs({
     required String topicCategory,
     String? languageCode,
+    int limit = 10,
   }) async {
+    final code = LanguageUtils.normalizeLanguageCode(languageCode ?? 'es');
     try {
-      final code = LessonCatalog.normalizeLanguageCode(languageCode ?? 'es');
       var query = _client.from('sentence_pairs').select().eq('language_code', code);
       if (topicCategory.isNotEmpty &&
           topicCategory != 'All Topics' &&
@@ -89,16 +115,16 @@ class SupabaseService {
           topicCategory != 'Advanced Fluency') {
         query = query.eq('topic_category', topicCategory);
       }
-      final response = await query.limit(50);
+      final response = await query.limit(limit);
       List<dynamic> data = response as List<dynamic>;
 
       if (data.isEmpty) {
-        // Query sentence pairs for this language from the 1.9M dataset
+        // Query sentence pairs for this language from dataset
         final fallbackResponse = await _client
             .from('sentence_pairs')
             .select()
             .eq('language_code', code)
-            .limit(50);
+            .limit(limit);
         data = fallbackResponse as List<dynamic>;
       }
 
@@ -109,17 +135,19 @@ class SupabaseService {
       debugPrint('Notice fetching sentence pairs from Supabase: $e');
     }
 
-    final catalogPairs = LessonCatalog.getSentencePairs(
-      topic: topicCategory,
-      targetLanguage: languageCode ?? 'Spanish',
+    return _generateFallbackSentencePairs(topicCategory: topicCategory, languageCode: code, limit: limit);
+  }
+
+  List<SentencePair> _generateFallbackSentencePairs({
+    required String topicCategory,
+    required String languageCode,
+    int limit = 10,
+  }) {
+    return LanguageUtils.getFallbackSentencePairs(
+      topicCategory: topicCategory,
+      targetLanguage: languageCode,
+      limit: limit,
     );
-
-    // Auto-seed catalog sentence pairs to Supabase in background
-    for (final pair in catalogPairs) {
-      upsertSentencePair(pair);
-    }
-
-    return catalogPairs;
   }
 
   Future<List<SrsReviewItem>> fetchDueSrsItems({required String userId}) async {

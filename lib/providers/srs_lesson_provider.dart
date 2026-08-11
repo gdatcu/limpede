@@ -52,10 +52,11 @@ class SrsLessonController extends _$SrsLessonController {
       final userId = userProfile?.id ?? 'local_user';
       final supabaseService = ref.read(supabaseServiceProvider);
 
-      // Fetch deterministic sentence pairs for selected topic
+      // Fetch deterministic sentence pairs for selected topic (microlesson limit of 10)
       List<SentencePair> pairs = await supabaseService.fetchSentencePairs(
         topicCategory: topic,
         languageCode: targetLanguage,
+        limit: 10,
       );
 
       // Fetch due SRS items for current user
@@ -86,6 +87,10 @@ class SrsLessonController extends _$SrsLessonController {
           }
         }
         pairs = [...duePairsForTopic, ...pairs];
+      }
+
+      if (pairs.length > 10) {
+        pairs = pairs.take(10).toList();
       }
 
       return SrsLessonDeck(
