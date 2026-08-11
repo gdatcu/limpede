@@ -118,16 +118,6 @@ class SupabaseService {
       final response = await query.limit(limit);
       List<dynamic> data = response as List<dynamic>;
 
-      if (data.isEmpty) {
-        // Query sentence pairs for this language from dataset
-        final fallbackResponse = await _client
-            .from('sentence_pairs')
-            .select()
-            .eq('language_code', code)
-            .limit(limit);
-        data = fallbackResponse as List<dynamic>;
-      }
-
       if (data.isNotEmpty) {
         return data.map((j) => SentencePair.fromJson(j as Map<String, dynamic>)).toList();
       }

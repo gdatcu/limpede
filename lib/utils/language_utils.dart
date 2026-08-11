@@ -80,6 +80,7 @@ class LanguageUtils {
           'Piacere',
           'Come stai?',
           'Buona giornata',
+          'A presto',
         ];
       case 'ro':
         return [
@@ -171,7 +172,7 @@ class LanguageUtils {
           languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Ich heiße” literally means “I am called”.',
+          grammarNotes: '“Ich heiße” means I am called in German.',
         ),
         SentencePair(
           id: 'de_fb_4',
@@ -189,52 +190,55 @@ class LanguageUtils {
           languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Vielen Dank” is a warm, polite form of thank you.',
+          grammarNotes: '“Vielen Dank” is a warm form of thank you.',
         ),
+      ];
+    } else if (code == 'it') {
+      defaultPairs = [
         SentencePair(
-          id: 'de_fb_6',
-          sourceText: 'See you tomorrow!',
-          targetText: 'Bis morgen!',
-          languageCode: 'de',
+          id: 'it_fb_1',
+          sourceText: 'Hello, how are you?',
+          targetText: 'Ciao, come stai?',
+          languageCode: 'it',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Bis” means until or see you.',
+          grammarNotes: '“Come stai?” is informal in Italian, used with friends.',
         ),
         SentencePair(
-          id: 'de_fb_7',
-          sourceText: 'Red and blue',
-          targetText: 'Rot und Blau',
-          languageCode: 'de',
+          id: 'it_fb_2',
+          sourceText: 'Good morning!',
+          targetText: 'Buongiorno!',
+          languageCode: 'it',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: 'Basic color terms in German.',
+          grammarNotes: 'Standard Italian morning greeting.',
         ),
         SentencePair(
-          id: 'de_fb_8',
-          sourceText: 'A table for two, please.',
-          targetText: 'Ein Tisch für zwei, bitte.',
-          languageCode: 'de',
+          id: 'it_fb_3',
+          sourceText: 'My name is Marco.',
+          targetText: 'Mi chiamo Marco.',
+          languageCode: 'it',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: 'Essential restaurant reservation request in German.',
+          grammarNotes: '“Mi chiamo” means I call myself in Italian.',
         ),
         SentencePair(
-          id: 'de_fb_9',
-          sourceText: 'Where is the train station?',
-          targetText: 'Wo ist der Bahnhof?',
-          languageCode: 'de',
+          id: 'it_fb_4',
+          sourceText: 'Nice to meet you.',
+          targetText: 'Piacere di conoscerti.',
+          languageCode: 'it',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Wo ist” means where is.',
+          grammarNotes: 'Polite Italian introduction.',
         ),
         SentencePair(
-          id: 'de_fb_10',
-          sourceText: 'Goodbye, see you soon!',
-          targetText: 'Tschüss, bis bald!',
-          languageCode: 'de',
+          id: 'it_fb_5',
+          sourceText: 'Thank you very much!',
+          targetText: 'Grazie mille!',
+          languageCode: 'it',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Tschüss” is common casual goodbye in German.',
+          grammarNotes: '“Mille” means a thousand, so thousands of thanks.',
         ),
       ];
     } else if (code == 'fr') {
@@ -267,6 +271,36 @@ class LanguageUtils {
           grammarNotes: '“Beaucoup” means very much.',
         ),
       ];
+    } else if (code == 'ro') {
+      defaultPairs = [
+        SentencePair(
+          id: 'ro_fb_1',
+          sourceText: 'Hello, how are you?',
+          targetText: 'Bună, ce mai faci?',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Standard friendly greeting in Romanian.',
+        ),
+        SentencePair(
+          id: 'ro_fb_2',
+          sourceText: 'Good morning!',
+          targetText: 'Bună dimineața!',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Romanian morning greeting.',
+        ),
+        SentencePair(
+          id: 'ro_fb_3',
+          sourceText: 'Thank you very much!',
+          targetText: 'Mulțumesc mult!',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Expressing gratitude in Romanian.',
+        ),
+      ];
     } else if (code == 'es') {
       defaultPairs = [
         SentencePair(
@@ -285,7 +319,7 @@ class LanguageUtils {
           languageCode: 'es',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: 'Used until midday.',
+          grammarNotes: 'Used until midday in Spanish.',
         ),
       ];
     }

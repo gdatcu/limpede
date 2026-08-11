@@ -4,6 +4,20 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.0.9] - 2026-08-11
+
+### 🐛 Cross-Language SRS Leak Fix & Native Italian Deck Fallbacks
+
+#### 🔒 Language-Strict SRS Review Deck Ingestion (`srs_lesson_provider.dart`)
+- **Resolved Cross-Language Content Leak**: Fixed issue where due SRS items from previously studied languages (e.g. Spanish `g_es_1`) were mixed into current active lesson decks for other target languages (e.g. Italian `it` or German `de`).
+- **Target Language Filter**: Added strict `pair.languageCode == normalizedLangCode` validation in `SrsLessonController.loadLessonDeck` so SRS review items only populate when matching the user's active target language.
+
+#### 🇮🇹 Italian & Multi-Language Fallback Decks (`language_utils.dart`)
+- **Native Italian Fallback Sentences**: Added native Italian sentence pairs (`"Ciao, come stai?"`, `"Buongiorno!"`, `"Mi chiamo Marco"`, `"Grazie mille!"`) and Italian multiple-choice distractors (`"Arrivederci"`, `"Piacere"`, `"Per favore"`).
+- **Target Language Fallback Routing**: Updated `SupabaseService.fetchSentencePairs` so topic fallback strictly serves language-matched sentence pairs rather than un-categorized dataset rows.
+
+---
+
 ## [v1.0.8] - 2026-08-11
 
 ### 🗺️ Dynamic Supabase Topic Path & Duolingo Serpentine Tree Migration

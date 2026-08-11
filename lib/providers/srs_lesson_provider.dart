@@ -3,11 +3,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/srs_models.dart';
 import '../providers/auth_provider.dart';
 import '../services/services.dart';
+import '../utils/language_utils.dart';
 import 'user_provider.dart';
 
 part 'srs_lesson_provider.g.dart';
-
-
 
 class SrsLessonDeck {
   final String topic;
@@ -51,6 +50,7 @@ class SrsLessonController extends _$SrsLessonController {
       final userProfile = ref.read(currentUserProfileProvider).asData?.value;
       final userId = userProfile?.id ?? 'local_user';
       final supabaseService = ref.read(supabaseServiceProvider);
+      final normalizedLangCode = LanguageUtils.normalizeLanguageCode(targetLanguage);
 
       // Fetch deterministic sentence pairs for selected topic (microlesson limit of 10)
       List<SentencePair> pairs = await supabaseService.fetchSentencePairs(
@@ -66,11 +66,11 @@ class SrsLessonController extends _$SrsLessonController {
       };
 
       if (isSrsReviewSession) {
-        // Build dedicated review deck using due sentence pairs
+        // Build dedicated review deck using due sentence pairs for the current target language
         List<SentencePair> reviewPairs = [];
         for (var srsItem in dueItems) {
           final pair = await supabaseService.fetchSentencePairById(srsItem.sentenceId);
-          if (pair != null) {
+          if (pair != null && pair.languageCode == normalizedLangCode) {
             reviewPairs.add(pair);
           }
         }
@@ -78,11 +78,13 @@ class SrsLessonController extends _$SrsLessonController {
           pairs = reviewPairs;
         }
       } else if (dueItems.isNotEmpty) {
-        // Mix in due SRS items so user repeatedly reviews items previously missed
+        // Mix in due SRS items matching the selected target language ONLY
         final duePairsForTopic = <SentencePair>[];
         for (var srsItem in dueItems) {
           final pair = await supabaseService.fetchSentencePairById(srsItem.sentenceId);
-          if (pair != null && !pairs.any((p) => p.id == pair.id)) {
+          if (pair != null &&
+              pair.languageCode == normalizedLangCode &&
+              !pairs.any((p) => p.id == pair.id)) {
             duePairsForTopic.add(pair);
           }
         }
