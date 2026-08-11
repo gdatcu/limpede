@@ -4,6 +4,17 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.6] - 2026-08-11
+
+### 🎯 Direct `translateUnit` & `translateNode` Skill Tree Integration
+
+#### 🛠️ Skill Tree Dynamic Translation (`home_screen.dart` & `topic_translator.dart`)
+- **Direct Method Wiring**: Integrated `TopicTranslator.translateUnit(unitName, nativeLanguageCode)` for Section Headers and `TopicTranslator.translateNode(nodeName, nativeLanguageCode)` for circular node buttons.
+- **Safe Splitting & Fallback Handling**: Safely parses `topic_category` strings containing `":"` or standalone titles without error.
+- **Strict Database Integrity Preserved**: Node `onTap` callbacks continue to pass the raw, original English `topic_category` string (*e.g. `"Basics: Saying hello and goodbye"`*) to the lesson controller for 100% accurate Supabase fetching.
+
+---
+
 ## [v1.1.5] - 2026-08-11
 
 ### 🌍 Dynamic Database Topic Category Localizations (`topic_translator.dart`)

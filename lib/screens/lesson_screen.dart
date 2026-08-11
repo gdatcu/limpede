@@ -163,7 +163,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          TopicTranslator.translate(widget.lessonId, nativeLang),
+          TopicTranslator.translateCategory(widget.lessonId, LanguageUtils.normalizeLanguageCode(nativeLang)),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),

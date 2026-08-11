@@ -1,203 +1,264 @@
-import 'language_utils.dart';
-
-/// Utility class for translating dynamic Supabase topic_category titles
-/// (e.g., "Basics: Saying hello and goodbye") into the user's native language.
 class TopicTranslator {
-  /// Dictionary mapping for Unit Names (Prefixes).
-  static final Map<String, Map<String, String>> _unitMap = {
-    'basics': {
+  // 1. UNIT PREFIXES (The Headers)
+  static const Map<String, Map<String, String>> _unitTranslations = {
+    'Basics': {
       'ro': 'Noțiuni de bază',
       'fr': 'Bases',
       'de': 'Grundlagen',
-      'es': 'Básicos',
-      'it': 'Fondamenti',
-      'pt': 'Básicos',
-      'ru': 'Основы',
-      'ja': '基本',
     },
-    'food': {
-      'ro': 'Mâncare',
+    'Food': {
+      'ro': 'Mâncare și Băuturi',
       'fr': 'Nourriture',
-      'de': 'Essen',
-      'es': 'Comida',
-      'it': 'Cibo',
-      'pt': 'Comida',
-      'ru': 'Еда',
-      'ja': '食べ物',
+      'de': 'Essen und Trinken',
     },
-    'travel': {
-      'ro': 'Călătorii',
-      'fr': 'Voyage',
-      'de': 'Reisen',
-      'es': 'Viajes',
-      'it': 'Viaggi',
-      'pt': 'Viagens',
-      'ru': 'Путешествия',
-      'ja': '旅行',
-    },
-    'family': {
+    'Family': {
       'ro': 'Familie',
       'fr': 'Famille',
       'de': 'Familie',
-      'es': 'Familia',
-      'it': 'Famiglia',
-      'pt': 'Família',
-      'ru': 'Семья',
-      'ja': '家族',
     },
-    'education': {
-      'ro': 'Educație',
-      'fr': 'Éducation',
-      'de': 'Bildung',
-      'es': 'Educación',
-      'it': 'Istruzione',
-      'pt': 'Educação',
-      'ru': 'Образование',
-      'ja': '教育',
+    'Home': {
+      'ro': 'Acasă',
+      'fr': 'Maison',
+      'de': 'Zuhause',
     },
-    'work': {
-      'ro': 'Muncă',
-      'fr': 'Travail',
-      'de': 'Arbeit',
-      'es': 'Trabajo',
-      'it': 'Lavoro',
-      'pt': 'Trabalho',
-      'ru': 'Работа',
-      'ja': '仕事',
+    'Travel': {
+      'ro': 'Călătorii',
+      'fr': 'Voyage',
+      'de': 'Reisen',
     },
-    'shopping': {
+    'Shopping': {
       'ro': 'Cumpărături',
-      'fr': 'Achats',
+      'fr': 'Shopping',
       'de': 'Einkaufen',
-      'es': 'Compras',
-      'it': 'Acquisti',
-      'pt': 'Compras',
-      'ru': 'Покупки',
-      'ja': '買い物',
     },
-    'health': {
+    'Weather': {
+      'ro': 'Vreme',
+      'fr': 'Météo',
+      'de': 'Wetter',
+    },
+    'Health': {
       'ro': 'Sănătate',
       'fr': 'Santé',
       'de': 'Gesundheit',
-      'es': 'Salud',
-      'it': 'Salute',
-      'pt': 'Saúde',
-      'ru': 'Здоровье',
-      'ja': '健康',
+    },
+    'Routine': {
+      'ro': 'Rutină zilnică',
+      'fr': 'Routine',
+      'de': 'Alltag',
+    },
+    'Hobbies': {
+      'ro': 'Hobby-uri',
+      'fr': 'Loisirs',
+      'de': 'Hobbys',
+    },
+    'Work': {
+      'ro': 'Muncă',
+      'fr': 'Travail',
+      'de': 'Arbeit',
+    },
+    'Memories': {
+      'ro': 'Amintiri',
+      'fr': 'Souvenirs',
+      'de': 'Erinnerungen',
+    },
+    'Opinions': {
+      'ro': 'Opinii',
+      'fr': 'Opinions',
+      'de': 'Meinungen',
+    },
+    'Romance': {
+      'ro': 'Romantic',
+      'fr': 'Romance',
+      'de': 'Romantik',
+    },
+    'Tech': {
+      'ro': 'Tehnologie',
+      'fr': 'Technologie',
+      'de': 'Technologie',
+    },
+    'Education': {
+      'ro': 'Educație',
+      'fr': 'Éducation',
+      'de': 'Bildung',
+    },
+    'Society': {
+      'ro': 'Societate',
+      'fr': 'Société',
+      'de': 'Gesellschaft',
+    },
+    'Finance': {
+      'ro': 'Finanțe',
+      'fr': 'Finances',
+      'de': 'Finanzen',
+    },
+    'Idioms': {
+      'ro': 'Expresii',
+      'fr': 'Expressions',
+      'de': 'Redewendungen',
+    },
+    'Specialized': {
+      'ro': 'Specializat',
+      'fr': 'Spécialisé',
+      'de': 'Spezialisiert',
     },
   };
 
-  /// Dictionary mapping for Node Names (Suffixes).
-  static final Map<String, Map<String, String>> _nodeMap = {
-    'saying hello and goodbye': {
+  // 2. NODE SUFFIXES (The Circular Buttons)
+  static const Map<String, Map<String, String>> _nodeTranslations = {
+    // Basics
+    'Saying hello and goodbye': {
       'ro': 'Saluturi și despărțiri',
       'fr': 'Dire bonjour et au revoir',
       'de': 'Begrüßung und Verabschiedung',
-      'es': 'Decir hola y adiós',
-      'it': 'Salutare e congedarsi',
-      'pt': 'Dizer olá e adeus',
-      'ru': 'Приветствие и прощание',
-      'ja': '挨拶とお別れ',
     },
-    'introducing yourself and your age': {
+    'Introducing yourself and your age': {
       'ro': 'Prezentare și vârstă',
-      'fr': 'Se présenter et dire son âge',
-      'de': 'Sich vorstellen und Alter',
-      'es': 'Presentarse y edad',
-      'it': 'Presentarsi e l\'età',
-      'pt': 'Apresentar-se e idade',
-      'ru': 'Знакомство и возраст',
-      'ja': '自己紹介と年齢',
+      'fr': 'Se présenter',
+      'de': 'Sich vorstellen',
     },
-    'ordering a coffee or tea': {
-      'ro': 'Comandarea unei cafele sau ceai',
-      'fr': 'Commander un café ou un thé',
-      'de': 'Kaffee oder Tee bestellen',
-      'es': 'Pedir un café o té',
-      'it': 'Ordinare un caffè o un tè',
-      'pt': 'Pedir um café ou chá',
-      'ru': 'Заказ кофе или чая',
-      'ja': 'コーヒーや紅茶を注文する',
+    'Saying please, thank you, and sorry': {
+      'ro': 'Politețe',
+      'fr': 'Politesse',
+      'de': 'Höflichkeit',
     },
-    'asking for directions': {
-      'ro': 'Solicitarea indicațiilor',
+    'Numbers 1 through 100': {
+      'ro': 'Numere 1-100',
+      'fr': 'Nombres 1-100',
+      'de': 'Zahlen 1-100',
+    },
+    'Days of the week and months': {
+      'ro': 'Zile și luni',
+      'fr': 'Jours et mois',
+      'de': 'Tage und Monate',
+    },
+    'Telling the time': {
+      'ro': 'Timpul și ora',
+      'fr': 'Dire l\'heure',
+      'de': 'Uhrzeit',
+    },
+    'Basic colors and shapes': {
+      'ro': 'Culori și forme',
+      'fr': 'Couleurs et formes',
+      'de': 'Farben und Formen',
+    },
+    
+    // Food
+    'Ordering a coffee or tea': {
+      'ro': 'Comandarea unei cafele/ceai',
+      'fr': 'Commander un café/thé',
+      'de': 'Kaffee/Tee bestellen',
+    },
+    'Asking for the menu': {
+      'ro': 'Cererea meniului',
+      'fr': 'Demander le menu',
+      'de': 'Nach der Speisekarte fragen',
+    },
+    'Paying the bill at a restaurant': {
+      'ro': 'Plata notei',
+      'fr': 'Payer l\'addition',
+      'de': 'Die Rechnung bezahlen',
+    },
+    'Naming basic fruits and vegetables': {
+      'ro': 'Fructe și legume',
+      'fr': 'Fruits et légumes',
+      'de': 'Obst und Gemüse',
+    },
+    'Discussing food allergies': {
+      'ro': 'Alergii alimentare',
+      'fr': 'Allergies alimentaires',
+      'de': 'Lebensmittelallergien',
+    },
+    'Grocery shopping for ingredients': {
+      'ro': 'Cumpărături alimentare',
+      'fr': 'Faire les courses',
+      'de': 'Lebensmitteleinkauf',
+    },
+
+    // Travel
+    'Asking where the bathroom is': {
+      'ro': 'Unde este baia?',
+      'fr': 'Où sont les toilettes ?',
+      'de': 'Wo ist die Toilette?',
+    },
+    'Buying a train or bus ticket': {
+      'ro': 'Bilete de tren/autobuz',
+      'fr': 'Acheter un billet',
+      'de': 'Fahrkarten kaufen',
+    },
+    'Asking for basic directions (left/right)': {
+      'ro': 'Direcții',
       'fr': 'Demander son chemin',
       'de': 'Nach dem Weg fragen',
-      'es': 'Pedir direcciones',
-      'it': 'Chiedere indicazioni',
-      'pt': 'Pedir direções',
-      'ru': 'Задать направление',
-      'ja': '道を尋ねる',
     },
-    'talking about family members': {
-      'ro': 'Despre membrii familiei',
-      'fr': 'Parler de sa famille',
-      'de': 'Über Familienmitglieder sprechen',
-      'es': 'Hablar sobre la familia',
-      'it': 'Parlare della famiglia',
-      'pt': 'Falar sobre a família',
-      'ru': 'Разговор о семье',
-      'ja': '家族について話す',
+    'Checking into a hotel': {
+      'ro': 'Cazarea la hotel',
+      'fr': 'Arrivée à l\'hôtel',
+      'de': 'Im Hotel einchecken',
     },
-    'asking for the check': {
-      'ro': 'Cere nota de plată',
-      'fr': 'Demander l\'addition',
-      'de': 'Nach der Rechnung fragen',
-      'es': 'Pedir la cuenta',
-      'it': 'Chiedere il conto',
-      'pt': 'Pedir a conta',
-      'ru': 'Просить счет',
-      'ja': 'お会計を頼む',
+    'Navigating the airport and security': {
+      'ro': 'La aeroport',
+      'fr': 'À l\'aéroport',
+      'de': 'Am Flughafen',
     },
-    'booking a hotel room': {
-      'ro': 'Rezervarea unei camere de hotel',
-      'fr': 'Réserver une chambre d\'hôtel',
-      'de': 'Ein Hotelzimmer buchen',
-      'es': 'Reservar una habitación de hotel',
-      'it': 'Prenotare una camera d\'albergo',
-      'pt': 'Reservar um quarto de hotel',
-      'ru': 'Бронирование номера в отеле',
-      'ja': 'ホテルを予約する',
+    'Dealing with lost luggage at the airport': {
+      'ro': 'Bagaje pierdute',
+      'fr': 'Bagages perdus',
+      'de': 'Verlorenes Gepäck',
     },
+
+    // Work / Tech / Society (Examples)
+    'Naming basic professions': {
+      'ro': 'Profesii',
+      'fr': 'Professions',
+      'de': 'Berufe',
+    },
+    'Preparing for a job interview': {
+      'ro': 'Interviu de angajare',
+      'fr': 'Entretien d\'embauche',
+      'de': 'Vorstellungsgespräch',
+    },
+    'Sending professional emails': {
+      'ro': 'Emailuri profesionale',
+      'fr': 'E-mails professionnels',
+      'de': 'Geschäftliche E-Mails',
+    },
+    'Using a smartphone and apps': {
+      'ro': 'Smartphone și aplicații',
+      'fr': 'Smartphone et applis',
+      'de': 'Smartphone und Apps',
+    },
+    'Browsing the internet': {
+      'ro': 'Navigare pe internet',
+      'fr': 'Naviguer sur Internet',
+      'de': 'Im Internet surfen',
+    }
   };
 
-  /// Translates an English dynamic topic string, unit, or node into the user's native language.
-  /// 
-  /// Supports "Unit: Node" format (e.g. "Basics: Saying hello and goodbye") as well as standalone strings.
-  static String translate(String englishText, String nativeLanguage) {
-    final code = LanguageUtils.normalizeLanguageCode(nativeLanguage);
-    if (code == 'en') return englishText;
+  /// Translates the Unit Prefix (e.g., "Basics")
+  static String translateUnit(String englishUnit, String langCode) {
+    if (langCode == 'en') return englishUnit;
+    return _unitTranslations[englishUnit]?[langCode] ?? englishUnit;
+  }
 
-    if (englishText.contains(':')) {
-      final parts = englishText.split(':');
+  /// Translates the Node Suffix (e.g., "Saying hello and goodbye")
+  static String translateNode(String englishNode, String langCode) {
+    if (langCode == 'en') return englishNode;
+    return _nodeTranslations[englishNode]?[langCode] ?? englishNode;
+  }
+
+  /// Translates a full category (e.g. "Basics: Saying hello and goodbye") or standalone topic string.
+  static String translateCategory(String englishCategory, String langCode) {
+    if (langCode == 'en') return englishCategory;
+    if (englishCategory.contains(':')) {
+      final parts = englishCategory.split(':');
       final prefix = parts[0].trim();
       final suffix = parts.sublist(1).join(':').trim();
-
-      final translatedPrefix = _translateUnit(prefix, code);
-      final translatedSuffix = _translateNode(suffix, code);
-
+      final translatedPrefix = translateUnit(prefix, langCode);
+      final translatedSuffix = translateNode(suffix, langCode);
       return '$translatedPrefix: $translatedSuffix';
     }
-
-    final translatedUnit = _translateUnit(englishText, code);
-    if (translatedUnit != englishText) return translatedUnit;
-
-    return _translateNode(englishText, code);
-  }
-
-  static String _translateUnit(String unit, String langCode) {
-    final key = unit.trim().toLowerCase();
-    if (_unitMap.containsKey(key) && _unitMap[key]!.containsKey(langCode)) {
-      return _unitMap[key]![langCode]!;
-    }
-    return unit;
-  }
-
-  static String _translateNode(String node, String langCode) {
-    final key = node.trim().toLowerCase();
-    if (_nodeMap.containsKey(key) && _nodeMap[key]!.containsKey(langCode)) {
-      return _nodeMap[key]![langCode]!;
-    }
-    return node;
+    final unitRes = translateUnit(englishCategory.trim(), langCode);
+    if (unitRes != englishCategory.trim()) return unitRes;
+    return translateNode(englishCategory.trim(), langCode);
   }
 }

@@ -20,7 +20,7 @@ class AppUpdateInfo {
 }
 
 class UpdateService {
-  static const String appVersion = '1.1.5';
+  static const String appVersion = '1.1.6';
   static const String repoOwner = 'gdatcu';
   static const String repoName = 'limpede';
 

@@ -6,6 +6,7 @@ import '../providers/course_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../providers/topic_provider.dart';
+import '../utils/language_utils.dart';
 import '../utils/localized_strings.dart';
 import '../utils/topic_translator.dart';
 import '../widgets/widgets.dart';
@@ -481,6 +482,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 );
               }
 
+              final nativeLangCode = LanguageUtils.normalizeLanguageCode(nativeLang);
+
               return SliverMainAxisGroup(
                 slivers: [
                   for (final unit in units) ...[
@@ -524,7 +527,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    TopicTranslator.translate(unit.unitName, nativeLang),
+                                    TopicTranslator.translateUnit(unit.unitName.trim(), nativeLangCode),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -569,11 +572,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final topicNode = unit.nodes[index];
                           final xOffset = _getSerpentineOffset(index);
 
+                          final String rawNodeName;
+                          if (topicNode.fullCategory.contains(':')) {
+                            final parts = topicNode.fullCategory.split(':');
+                            rawNodeName = parts.sublist(1).join(':').trim();
+                          } else {
+                            rawNodeName = topicNode.nodeName.trim();
+                          }
+
+                          final translatedNodeName = TopicTranslator.translateNode(rawNodeName, nativeLangCode);
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16.0),
                             child: SkillTreeNodeWidget(
                               node: topicNode,
-                              displayName: TopicTranslator.translate(topicNode.nodeName, nativeLang),
+                              displayName: translatedNodeName,
                               xOffset: xOffset,
                               onTap: () {
                                 context.push(
