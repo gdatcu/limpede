@@ -562,7 +562,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Review SRS items or try again tomorrow to refill hearts.',
+              'Complete a Daily Review or try again tomorrow to refill hearts.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium,
             ),

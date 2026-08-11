@@ -64,6 +64,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final courseState = ref.watch(courseStateNotifierProvider);
+    final nativeLang = courseState.nativeLanguage;
+
     return Scaffold(
       body: IndexedStack(
         index: _currentTab,
@@ -78,21 +81,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onDestinationSelected: (idx) {
           setState(() => _currentTab = idx);
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.school_outlined),
-            selectedIcon: Icon(Icons.school),
-            label: 'Learn',
+            icon: const Icon(Icons.school_outlined),
+            selectedIcon: const Icon(Icons.school),
+            label: LocalizedStrings.getNavLearn(nativeLang),
           ),
           NavigationDestination(
-            icon: Icon(Icons.leaderboard_outlined),
-            selectedIcon: Icon(Icons.leaderboard),
-            label: 'Leaderboard',
+            icon: const Icon(Icons.leaderboard_outlined),
+            selectedIcon: const Icon(Icons.leaderboard),
+            label: LocalizedStrings.getNavLeaderboard(nativeLang),
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: LocalizedStrings.getNavProfile(nativeLang),
           ),
         ],
       ),
@@ -315,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
 
-          // SRS Daily Review Card
+          // Daily Review Card (No SRS Jargon)
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -343,16 +346,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              LocalizedStrings.getSrsReviewTitle(nativeLang),
+                              LocalizedStrings.getDailyReviewTitle(nativeLang),
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.onTertiaryContainer,
                               ),
                             ),
                             Text(
-                              dueCount > 0
-                                  ? '$dueCount items due for review today!'
-                                  : 'All reviews completed for today! Great job!',
+                              LocalizedStrings.getDueItemsSubtext(nativeLang, dueCount),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onTertiaryContainer.withValues(alpha: 0.8),
                               ),
@@ -363,8 +364,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () {
+                          final reviewTitle = LocalizedStrings.getDailyReviewTitle(nativeLang);
                           context.push(
-                            '/lesson/${Uri.encodeComponent("SRS Review")}?language=$targetLang&isSrsReview=true',
+                            '/lesson/${Uri.encodeComponent(reviewTitle)}?language=$targetLang&isSrsReview=true',
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -374,7 +376,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: Text(dueCount > 0 ? 'Review ($dueCount)' : 'Practice'),
+                        child: Text(LocalizedStrings.getBtnReview(nativeLang, dueCount)),
                       ),
                     ],
                   ),
@@ -383,7 +385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Banner for AI Custom Lessons (Demoted AI Optional Helper)
+          // Custom Topic Assistant Card
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -418,7 +420,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                             ),
                             Text(
-                              'Generate a custom topic deck offline or on-demand!',
+                              LocalizedStrings.getCustomTopicSubtext(nativeLang),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                               ),
@@ -436,7 +438,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text('Create'),
+                        child: Text(LocalizedStrings.getBtnCreate(nativeLang)),
                       ),
                     ],
                   ),

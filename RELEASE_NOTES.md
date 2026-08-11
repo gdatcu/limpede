@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.3] - 2026-08-11
+
+### 🌐 Native UI Localizations & Technical Jargon Removal
+
+#### 💬 Complete Native UI Localizations (`localized_strings.dart`)
+- **Core UI Localizations**: Added localized strings based on `NativeLanguage` for BottomNavigationBar (`Learn`/`Învață`/`Apprendre`/`Lernen`), Daily Review card titles & subtexts, Custom Topic Assistant cards, and action buttons (`Create`, `Review`).
+- **Multi-Language Support**: Complete translations provided across English, Romanian, French, German, Spanish, Italian, Portuguese, Russian, and Japanese.
+
+#### 🧹 Removed "SRS" Jargon (`home_screen.dart` & `lesson_screen.dart`)
+- **User-Friendly Terminology**: Replaced technical references like "SRS Review" with "Daily Review" / "Recapitulare Zilnică" / "Révision Quotidienne" across all UI cards, headers, and modal sheets.
+
+---
+
 ## [v1.1.2] - 2026-08-11
 
 ### 🎨 Language Selector Unfiltered Dropdowns & Auto-Correction UX
