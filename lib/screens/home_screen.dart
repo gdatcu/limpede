@@ -38,6 +38,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return sequence[index % sequence.length];
   }
 
+  List<DropdownMenuItem<String>> _buildNativeLanguageItems(String targetLang) {
+    if (targetLang != 'English') {
+      return const [
+        DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
+      ];
+    }
+    return const [
+      DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
+      DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Română')),
+      DropdownMenuItem(value: 'French', child: Text('🇫🇷 Français')),
+      DropdownMenuItem(value: 'German', child: Text('🇩🇪 Deutsch')),
+      DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Español')),
+    ];
+  }
+
+  List<DropdownMenuItem<String>> _buildTargetLanguageItems(String nativeLang) {
+    if (nativeLang != 'English') {
+      return const [
+        DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
+      ];
+    }
+    return const [
+      DropdownMenuItem(value: 'German', child: Text('🇩🇪 German')),
+      DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
+      DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
+      DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
+      DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Romanian')),
+      DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
+      DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
+      DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,13 +159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         value: nativeLang,
                         isDense: true,
                         icon: const SizedBox.shrink(),
-                        items: const [
-                          DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
-                          DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Română')),
-                          DropdownMenuItem(value: 'French', child: Text('🇫🇷 Français')),
-                          DropdownMenuItem(value: 'German', child: Text('🇩🇪 Deutsch')),
-                          DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Español')),
-                        ],
+                        items: _buildNativeLanguageItems(targetLang),
                         onChanged: (val) {
                           if (val != null) {
                             ref.read(courseStateNotifierProvider.notifier).setNativeLanguage(val);
@@ -152,17 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         value: targetLang,
                         isDense: true,
                         icon: const Icon(Icons.arrow_drop_down),
-                        items: const [
-                          DropdownMenuItem(value: 'German', child: Text('🇩🇪 German')),
-                          DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
-                          DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
-                          DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
-                          DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
-                          DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Romanian')),
-                          DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
-                          DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
-                          DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
-                        ],
+                        items: _buildTargetLanguageItems(nativeLang),
                         onChanged: (val) {
                           if (val != null) {
                             ref.read(courseStateNotifierProvider.notifier).setTargetLanguage(val);

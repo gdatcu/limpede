@@ -7,7 +7,7 @@ part of 'course_provider.dart';
 // **************************************************************************
 
 String _$courseStateNotifierHash() =>
-    r'e056c08d5f75c384eaf3112815750e839af51ca6';
+    r'55c199a4ac1aff8ed42755255316a676a13aca1c';
 
 /// See also [CourseStateNotifier].
 @ProviderFor(CourseStateNotifier)

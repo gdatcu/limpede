@@ -2,9 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/srs_models.dart';
 import '../providers/auth_provider.dart';
+import '../providers/course_provider.dart';
 import '../services/services.dart';
-import '../utils/language_utils.dart';
-import 'user_provider.dart';
+import '../services/srs_engine.dart';
 
 part 'srs_lesson_provider.g.dart';
 
@@ -42,7 +42,7 @@ class SrsLessonController extends _$SrsLessonController {
 
   Future<void> loadLessonDeck({
     required String topic,
-    required String targetLanguage,
+    String? targetLanguage,
     bool isSrsReviewSession = false,
   }) async {
     state = const AsyncValue.loading();
@@ -50,12 +50,17 @@ class SrsLessonController extends _$SrsLessonController {
       final userProfile = ref.read(currentUserProfileProvider).asData?.value;
       final userId = userProfile?.id ?? 'local_user';
       final supabaseService = ref.read(supabaseServiceProvider);
-      final normalizedLangCode = LanguageUtils.normalizeLanguageCode(targetLanguage);
+      final courseState = ref.read(courseStateNotifierProvider);
+
+      // Query language code based on mode:
+      // isReverseMode == false (English -> Foreign): query targetLanguage code (e.g. 'de')
+      // isReverseMode == true (Foreign -> English): query nativeLanguage code (e.g. 'ro')
+      final queryLangCode = courseState.queryLanguageCode;
 
       // Fetch deterministic sentence pairs for selected topic (microlesson limit of 10)
       List<SentencePair> pairs = await supabaseService.fetchSentencePairs(
         topicCategory: topic,
-        languageCode: targetLanguage,
+        languageCode: queryLangCode,
         limit: 10,
       );
 
@@ -66,11 +71,11 @@ class SrsLessonController extends _$SrsLessonController {
       };
 
       if (isSrsReviewSession) {
-        // Build dedicated review deck using due sentence pairs for the current target language
+        // Build dedicated review deck using due sentence pairs for active query language
         List<SentencePair> reviewPairs = [];
         for (var srsItem in dueItems) {
           final pair = await supabaseService.fetchSentencePairById(srsItem.sentenceId);
-          if (pair != null && pair.languageCode == normalizedLangCode) {
+          if (pair != null && pair.languageCode == queryLangCode) {
             reviewPairs.add(pair);
           }
         }
@@ -78,12 +83,12 @@ class SrsLessonController extends _$SrsLessonController {
           pairs = reviewPairs;
         }
       } else if (dueItems.isNotEmpty) {
-        // Mix in due SRS items matching the selected target language ONLY
+        // Mix in due SRS items matching active query language ONLY
         final duePairsForTopic = <SentencePair>[];
         for (var srsItem in dueItems) {
           final pair = await supabaseService.fetchSentencePairById(srsItem.sentenceId);
           if (pair != null &&
-              pair.languageCode == normalizedLangCode &&
+              pair.languageCode == queryLangCode &&
               !pairs.any((p) => p.id == pair.id)) {
             duePairsForTopic.add(pair);
           }
@@ -97,7 +102,7 @@ class SrsLessonController extends _$SrsLessonController {
 
       return SrsLessonDeck(
         topic: topic,
-        targetLanguage: targetLanguage,
+        targetLanguage: courseState.targetLanguage,
         sentencePairs: pairs,
         existingSrsItems: srsMap,
         isSrsReviewSession: isSrsReviewSession,
@@ -105,31 +110,24 @@ class SrsLessonController extends _$SrsLessonController {
     });
   }
 
-  bool _isValidUuid(String? id) {
-    if (id == null) return false;
-    final RegExp uuidRegExp = RegExp(
-      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-    );
-    return uuidRegExp.hasMatch(id);
-  }
-
   Future<void> recordAnswer({
     required SentencePair sentencePair,
-    required int grade, // 0 = fail, 3 = hard, 5 = perfect
+    required int grade,
   }) async {
     final userProfile = ref.read(currentUserProfileProvider).asData?.value;
-    final supabaseUser = ref.read(supabaseServiceProvider).currentUser;
-    final userId = (userProfile != null && _isValidUuid(userProfile.id))
-        ? userProfile.id
-        : (supabaseUser != null ? supabaseUser.id : 'guest_local');
+    final userId = userProfile?.id ?? 'local_user';
     final supabaseService = ref.read(supabaseServiceProvider);
 
-    final currentData = state.asData?.value;
-    final existingItem = currentData?.existingSrsItems[sentencePair.id] ??
+    final currentDeck = state.value;
+    final existingItem = currentDeck?.existingSrsItems[sentencePair.id] ??
         SrsReviewItem(
-          sentenceId: sentencePair.id,
+          id: 'srs_${sentencePair.id}',
           userId: userId,
+          sentenceId: sentencePair.id,
           nextReviewDate: DateTime.now(),
+          intervalDays: 0,
+          easeFactor: 2.5,
+          consecutiveCorrect: 0,
         );
 
     final updatedSrsItem = SrsEngine.calculateNextReview(
@@ -137,31 +135,26 @@ class SrsLessonController extends _$SrsLessonController {
       grade: grade,
     );
 
-    // Save updated SRS metrics back to Supabase (and auto-seed sentence pair)
-    await supabaseService.upsertSrsReviewItem(
-      updatedSrsItem,
-      sentencePair: sentencePair,
-    );
+    await supabaseService.upsertSrsReviewItem(updatedSrsItem);
 
-    // Refresh due SRS count
+    if (currentDeck != null) {
+      final updatedMap = Map<String, SrsReviewItem>.from(currentDeck.existingSrsItems);
+      updatedMap[sentencePair.id] = updatedSrsItem;
+      state = AsyncValue.data(SrsLessonDeck(
+        topic: currentDeck.topic,
+        targetLanguage: currentDeck.targetLanguage,
+        sentencePairs: currentDeck.sentencePairs,
+        existingSrsItems: updatedMap,
+        isSrsReviewSession: currentDeck.isSrsReviewSession,
+      ));
+    }
+
     ref.invalidate(dueSrsCountProvider);
   }
 
-
-  Future<void> finishLesson({required String topic, int xpEarned = 25}) async {
-    final userProfile = ref.read(currentUserProfileProvider).asData?.value;
-    final userId = userProfile?.id ?? 'local_user';
-    final supabaseService = ref.read(supabaseServiceProvider);
-
-    await supabaseService.completeLessonAndAwardXp(
-      userId: userId,
-      topic: topic,
-      xpEarned: xpEarned,
-    );
-
-    ref.invalidate(dueSrsCountProvider);
+  Future<void> finishLesson({required String topic}) async {
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.completeLesson(topic: topic, xpEarned: 25);
     ref.invalidate(currentUserProfileProvider);
-    ref.invalidate(completedTopicsProvider);
   }
 }
-

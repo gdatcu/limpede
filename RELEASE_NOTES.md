@@ -4,6 +4,23 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.1] - 2026-08-11
+
+### 🛠️ Language Pair Validation & Reverse Supabase Query Fix
+
+#### 🔒 Restricted Language Selector (`course_provider.dart` & `home_screen.dart`)
+- **Strict English Pairing Rule**: Enforced that either `nativeLanguage` or `targetLanguage` must be English. Disallowed invalid foreign-to-foreign combinations (e.g. French -> German) since the database contains English-paired rows.
+- **Dynamic Dropdown Locking**: When a user selects a non-English native language (e.g. Romanian), the target language dropdown locks exclusively to English. When a user selects a foreign target language (e.g. German), the native language locks to English.
+
+#### 🗄️ Corrected Supabase Query (`srs_lesson_provider.dart`)
+- **Query Language Alignment**: Fixed query logic to query `language_code = targetLanguageCode` in normal mode (`isReverseMode == false`) and `language_code = nativeLanguageCode` in reverse mode (`isReverseMode == true`), correctly fetching the required rows for virtual swapping.
+
+#### 🎯 Verified Virtual Swap Mapping (`lesson_screen.dart`)
+- **Normal Mode**: Question = `pair.sourceText` (English), Correct Answer & Options = `pair.targetText` (Foreign).
+- **Reverse Mode**: Question = `pair.targetText` (Foreign), Correct Answer & Options = `pair.sourceText` (English).
+
+---
+
 ## [v1.1.0] - 2026-08-11
 
 ### 🔄 Virtual Reverse Decks & Native UI Localizations

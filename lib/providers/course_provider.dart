@@ -18,8 +18,8 @@ class CourseState {
       targetLanguage.trim().toLowerCase() == 'english';
 
   /// Returns the language code to query in Supabase sentence_pairs.
-  /// If learning German as English speaker: returns 'de'.
-  /// If learning English as Romanian speaker: returns 'ro' (via Virtual Reverse Swap).
+  /// If isReverseMode == false (English -> Foreign): returns targetLanguage code (e.g. 'de').
+  /// If isReverseMode == true (Foreign -> English): returns nativeLanguage code (e.g. 'ro').
   String get queryLanguageCode {
     if (isReverseMode) {
       return LanguageUtils.normalizeLanguageCode(nativeLanguage);
@@ -50,23 +50,48 @@ class CourseStateNotifier extends _$CourseStateNotifier {
 
   void setNativeLanguage(String lang) {
     if (lang == state.nativeLanguage) return;
-    // If native language is set to English and target was English, switch target to German
     String newTarget = state.targetLanguage;
-    if (lang == 'English' && newTarget == 'English') {
+    if (lang != 'English') {
+      // Non-English native speaker can ONLY learn English (Foreign -> English reverse mode)
+      newTarget = 'English';
+    } else if (newTarget == 'English') {
+      // Native is English, target was English -> set default foreign target
       newTarget = 'German';
     }
-    state = state.copyWith(nativeLanguage: lang, targetLanguage: newTarget);
+    state = CourseState(
+      nativeLanguage: lang,
+      targetLanguage: newTarget,
+    );
   }
 
   void setTargetLanguage(String lang) {
     if (lang == state.targetLanguage) return;
-    state = state.copyWith(targetLanguage: lang);
+    String newNative = state.nativeLanguage;
+    if (lang != 'English') {
+      // Learning a foreign language requires native language to be English
+      newNative = 'English';
+    } else if (newNative == 'English') {
+      // Target is English, native was English -> set default foreign native (e.g. Romanian)
+      newNative = 'Romanian';
+    }
+    state = CourseState(
+      nativeLanguage: newNative,
+      targetLanguage: lang,
+    );
   }
 
   void setCourse({required String nativeLanguage, required String targetLanguage}) {
-    state = CourseState(
-      nativeLanguage: nativeLanguage,
-      targetLanguage: targetLanguage,
-    );
+    // Validate constraint: either nativeLanguage == 'English' or targetLanguage == 'English'
+    if (nativeLanguage != 'English' && targetLanguage != 'English') {
+      state = CourseState(
+        nativeLanguage: nativeLanguage,
+        targetLanguage: 'English',
+      );
+    } else {
+      state = CourseState(
+        nativeLanguage: nativeLanguage,
+        targetLanguage: targetLanguage,
+      );
+    }
   }
 }
