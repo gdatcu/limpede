@@ -3,12 +3,14 @@ import '../providers/topic_provider.dart';
 
 class SkillTreeNodeWidget extends StatelessWidget {
   final TopicNode node;
+  final String? displayName;
   final double xOffset;
   final VoidCallback onTap;
 
   const SkillTreeNodeWidget({
     super.key,
     required this.node,
+    this.displayName,
     required this.xOffset,
     required this.onTap,
   });
@@ -25,6 +27,8 @@ class SkillTreeNodeWidget extends StatelessWidget {
             ? theme.colorScheme.outlineVariant
             : theme.colorScheme.primary;
 
+    final title = displayName ?? node.nodeName;
+
     return Transform.translate(
       offset: Offset(xOffset, 0),
       child: Column(
@@ -36,7 +40,7 @@ class SkillTreeNodeWidget extends StatelessWidget {
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Complete the previous lesson to unlock "${node.nodeName}"!'),
+                    content: Text('Complete the previous lesson to unlock "$title"!'),
                     duration: const Duration(seconds: 2),
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -113,7 +117,7 @@ class SkillTreeNodeWidget extends StatelessWidget {
               ),
             ),
             child: Text(
-              node.nodeName,
+              title,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

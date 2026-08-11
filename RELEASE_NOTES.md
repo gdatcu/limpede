@@ -4,6 +4,17 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.5] - 2026-08-11
+
+### 🌍 Dynamic Database Topic Category Localizations (`topic_translator.dart`)
+
+#### 🗺️ Dynamic Topic Translator (`TopicTranslator`)
+- **Unit & Node Dictionary Maps**: Added translation dictionaries for curriculum Unit prefixes (*Basics, Food, Travel, Family, Education, Work, Shopping, Health*) and Node suffixes (*Saying hello and goodbye, Introducing yourself, Ordering a coffee, Asking for directions*, etc.) across all 9 supported languages.
+- **Native Title Interception (`HomeScreen` & `SkillTreeNodeWidget`)**: Visual headers and node titles on the skill tree route through `TopicTranslator.translate(..., nativeLang)` to display localized titles based on the user's selected `NativeLanguage`.
+- **Preserved Database Queries**: `onTap` events continue passing the original English `topic_category` string to lesson controllers, ensuring 100% accurate Supabase query execution.
+
+---
+
 ## [v1.1.4] - 2026-08-11
 
 ### 🐛 Purged Placeholder Strings & Enhanced Daily Review Fallbacks

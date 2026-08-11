@@ -7,6 +7,7 @@ import '../providers/settings_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../providers/topic_provider.dart';
 import '../utils/localized_strings.dart';
+import '../utils/topic_translator.dart';
 import '../widgets/widgets.dart';
 import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
@@ -523,7 +524,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    unit.unitName,
+                                    TopicTranslator.translate(unit.unitName, nativeLang),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -572,6 +573,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16.0),
                             child: SkillTreeNodeWidget(
                               node: topicNode,
+                              displayName: TopicTranslator.translate(topicNode.nodeName, nativeLang),
                               xOffset: xOffset,
                               onTap: () {
                                 context.push(

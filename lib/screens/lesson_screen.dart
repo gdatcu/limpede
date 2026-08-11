@@ -9,6 +9,7 @@ import '../providers/lesson_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../utils/language_utils.dart';
 import '../utils/localized_strings.dart';
+import '../utils/topic_translator.dart';
 import '../widgets/widgets.dart';
 
 class LessonScreen extends ConsumerStatefulWidget {
@@ -162,7 +163,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.lessonId,
+          TopicTranslator.translate(widget.lessonId, nativeLang),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
