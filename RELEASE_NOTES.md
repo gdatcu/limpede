@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.4] - 2026-08-11
+
+### 🐛 Purged Placeholder Strings & Enhanced Daily Review Fallbacks
+
+#### 🧹 Elimination of "Sample phrase X" Placeholders (`language_utils.dart`)
+- **Authentic Fallback Sentences**: Completely replaced dynamic placeholder strings (such as `"Sample phrase 4 for Révision Quotidienne"`) with rich, natural A1-level sentence pairs across all 9 supported languages (German, French, Romanian, Spanish, Italian, Portuguese, Russian, Japanese, English).
+- **Clean Option Generation**: Option/distractor generator now exclusively presents natural phrases in the user's target or native language.
+
+#### 🔀 Practice Deck Fallback for Review Sessions (`srs_lesson_provider.dart`)
+- **Empty Review Backlog Protection**: When a Daily Review session starts with 0 due items (e.g. for guest or new users), the lesson engine dynamically populates the session with general practice sentence pairs for the active course language rather than querying non-existent topic titles.
+
+---
+
 ## [v1.1.3] - 2026-08-11
 
 ### 🌐 Native UI Localizations & Technical Jargon Removal

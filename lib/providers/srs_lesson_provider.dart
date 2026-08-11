@@ -80,7 +80,26 @@ class SrsLessonController extends _$SrsLessonController {
           }
         }
         if (reviewPairs.isNotEmpty) {
-          pairs = reviewPairs;
+          // Fill deck with extra practice pairs from general topic if due items < 5
+          final practicePairs = await supabaseService.fetchSentencePairs(
+            topicCategory: 'Basics: Saying hello and goodbye',
+            languageCode: queryLangCode,
+            limit: 10,
+          );
+          final combined = [...reviewPairs];
+          for (var p in practicePairs) {
+            if (!combined.any((item) => item.id == p.id)) {
+              combined.add(p);
+            }
+          }
+          pairs = combined;
+        } else {
+          // If no due items exist, load general practice pairs for the active query language
+          pairs = await supabaseService.fetchSentencePairs(
+            topicCategory: 'Basics: Saying hello and goodbye',
+            languageCode: queryLangCode,
+            limit: 10,
+          );
         }
       } else if (dueItems.isNotEmpty) {
         // Mix in due SRS items matching active query language ONLY

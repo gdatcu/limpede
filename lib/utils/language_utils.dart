@@ -1,75 +1,88 @@
 import '../models/srs_models.dart';
 
 class LanguageUtils {
-  /// Normalizes target language names to standard ISO 639-1 language codes.
-  static String normalizeLanguageCode(String targetLanguage) {
-    final lang = targetLanguage.trim().toLowerCase();
-    if (lang == 'es' || lang.contains('spanish')) return 'es';
-    if (lang == 'fr' || lang.contains('french')) return 'fr';
-    if (lang == 'de' || lang.contains('german')) return 'de';
-    if (lang == 'it' || lang.contains('italian')) return 'it';
-    if (lang == 'ro' || lang.contains('romanian')) return 'ro';
-    if (lang == 'pt' || lang.contains('portuguese')) return 'pt';
-    if (lang == 'ru' || lang.contains('russian')) return 'ru';
-    if (lang == 'ja' || lang.contains('japanese')) return 'ja';
-    if (lang == 'tr' || lang.contains('turkish')) return 'tr';
-    return lang;
-  }
+  /// Map of full language names to 2-letter ISO 639-1 language codes.
+  static const Map<String, String> _languageNameToCodeMap = {
+    'german': 'de',
+    'french': 'fr',
+    'spanish': 'es',
+    'italian': 'it',
+    'romanian': 'ro',
+    'portuguese': 'pt',
+    'russian': 'ru',
+    'japanese': 'ja',
+    'english': 'en',
+  };
 
-  /// Returns a country flag emoji for display.
-  static String getLanguageFlag(String targetLanguage) {
-    final code = normalizeLanguageCode(targetLanguage);
-    switch (code) {
-      case 'es':
-        return '🇪🇸';
-      case 'fr':
-        return '🇫🇷';
-      case 'de':
-        return '🇩🇪';
-      case 'it':
-        return '🇮🇹';
-      case 'ro':
-        return '🇷🇴';
-      case 'pt':
-        return '🇵🇹';
-      case 'ru':
-        return '🇷🇺';
-      case 'ja':
-        return '🇯🇵';
-      case 'tr':
-        return '🇹🇷';
-      default:
-        return '🌐';
+  /// Map of 2-letter ISO 639-1 language codes to full display names.
+  static const Map<String, String> _languageCodeToNameMap = {
+    'de': 'German',
+    'fr': 'French',
+    'es': 'Spanish',
+    'it': 'Italian',
+    'ro': 'Romanian',
+    'pt': 'Portuguese',
+    'ru': 'Russian',
+    'ja': 'Japanese',
+    'en': 'English',
+  };
+
+  /// Normalizes any language input (name or code) into a standard 2-letter code.
+  /// 
+  /// Example:
+  /// - `normalizeLanguageCode('German')` -> `'de'`
+  /// - `normalizeLanguageCode('DE')` -> `'de'`
+  /// - `normalizeLanguageCode('de')` -> `'de'`
+  static String normalizeLanguageCode(String input) {
+    final cleanInput = input.trim().toLowerCase();
+    if (_languageNameToCodeMap.containsKey(cleanInput)) {
+      return _languageNameToCodeMap[cleanInput]!;
     }
+    if (_languageCodeToNameMap.containsKey(cleanInput)) {
+      return cleanInput;
+    }
+    // Fallback: default to 'de' if unrecognized
+    return 'de';
   }
 
-  /// Returns language-appropriate distractor options for multiple choice questions.
-  static List<String> getFallbackDistractors(String targetLanguage) {
+  /// Converts a language input into a full clean display name.
+  static String getLanguageDisplayName(String input) {
+    final code = normalizeLanguageCode(input);
+    return _languageCodeToNameMap[code] ?? 'German';
+  }
+
+  /// Returns sample words for distractors in fallback option generators.
+  static List<String> getFallbackDistractors(String targetLanguage) => getSampleWords(targetLanguage);
+
+  static List<String> getSampleWords(String targetLanguage) {
     final code = normalizeLanguageCode(targetLanguage);
     switch (code) {
       case 'de':
         return [
-          'Guten Tag',
-          'Danke schön',
+          'Vielen Dank',
           'Auf Wiedersehen',
-          'Sehr gut',
-          'Ja, bitte',
-          'Entschuldigung',
-          'Bis morgen',
-          'Alles klar',
-          'Ich heiße Alex',
-          'Wie geht es dir?',
+          'Guten Morgen',
+          'Bitte',
+          'Freut mich',
+          'Wie gehts?',
         ];
       case 'fr':
         return [
           'Merci beaucoup',
           'Au revoir',
+          'Bonjour',
           'S\'il vous plaît',
-          'Bonsoir',
-          'À demain',
           'Enchanté',
           'Comment ça va?',
-          'Bonne journée',
+        ];
+      case 'ro':
+        return [
+          'Mulțumesc mult',
+          'La revedere',
+          'Bună dimineața',
+          'Vă rog',
+          'Încântat de cunoștință',
+          'Ce mai faci?',
         ];
       case 'it':
         return [
@@ -77,25 +90,13 @@ class LanguageUtils {
           'Arrivederci',
           'Buongiorno',
           'Per favore',
-          'Piacere',
+          'Piacere di conoscerti',
           'Come stai?',
-          'Buona giornata',
-          'A presto',
-        ];
-      case 'ro':
-        return [
-          'Mulțumesc mult',
-          'La revedere',
-          'Bună dimineața',
-          'Te rog',
-          'Încântat',
-          'Ce mai faci?',
-          'O zi bună',
         ];
       case 'pt':
         return [
           'Muito obrigado',
-          'Até logo',
+          'Tchau',
           'Bom dia',
           'Por favor',
           'Prazer em conhecê-lo',
@@ -139,9 +140,6 @@ class LanguageUtils {
     int limit = 10,
   }) {
     final code = normalizeLanguageCode(targetLanguage);
-    final cleanTopic = topicCategory.contains(':')
-        ? topicCategory.split(':').sublist(1).join(':').trim()
-        : topicCategory;
 
     List<SentencePair> defaultPairs = [];
 
@@ -154,7 +152,7 @@ class LanguageUtils {
           languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Wie geht es dir?” is informal in German, used with friends.',
+          grammarNotes: '“Wie geht es dir?” is informal in German.',
         ),
         SentencePair(
           id: 'de_fb_2',
@@ -163,7 +161,7 @@ class LanguageUtils {
           languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: 'Standard morning greeting in German until midday.',
+          grammarNotes: 'Standard morning greeting in German.',
         ),
         SentencePair(
           id: 'de_fb_3',
@@ -172,7 +170,7 @@ class LanguageUtils {
           languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Ich heiße” means I am called in German.',
+          grammarNotes: '“Ich heiße” means I am called.',
         ),
         SentencePair(
           id: 'de_fb_4',
@@ -192,53 +190,32 @@ class LanguageUtils {
           topicCategory: topicCategory,
           grammarNotes: '“Vielen Dank” is a warm form of thank you.',
         ),
-      ];
-    } else if (code == 'it') {
-      defaultPairs = [
         SentencePair(
-          id: 'it_fb_1',
-          sourceText: 'Hello, how are you?',
-          targetText: 'Ciao, come stai?',
-          languageCode: 'it',
+          id: 'de_fb_6',
+          sourceText: 'Where is the train station?',
+          targetText: 'Wo ist der Bahnhof?',
+          languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Come stai?” is informal in Italian, used with friends.',
+          grammarNotes: '“Wo ist” means where is.',
         ),
         SentencePair(
-          id: 'it_fb_2',
-          sourceText: 'Good morning!',
-          targetText: 'Buongiorno!',
-          languageCode: 'it',
+          id: 'de_fb_7',
+          sourceText: 'I would like a coffee, please.',
+          targetText: 'Ich hätte gerne einen Kaffee, bitte.',
+          languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: 'Standard Italian morning greeting.',
+          grammarNotes: 'Polite ordering phrasing in German.',
         ),
         SentencePair(
-          id: 'it_fb_3',
-          sourceText: 'My name is Marco.',
-          targetText: 'Mi chiamo Marco.',
-          languageCode: 'it',
+          id: 'de_fb_8',
+          sourceText: 'Goodbye, see you tomorrow!',
+          targetText: 'Auf Wiedersehen, bis morgen!',
+          languageCode: 'de',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“Mi chiamo” means I call myself in Italian.',
-        ),
-        SentencePair(
-          id: 'it_fb_4',
-          sourceText: 'Nice to meet you.',
-          targetText: 'Piacere di conoscerti.',
-          languageCode: 'it',
-          difficultyLevel: 'A1',
-          topicCategory: topicCategory,
-          grammarNotes: 'Polite Italian introduction.',
-        ),
-        SentencePair(
-          id: 'it_fb_5',
-          sourceText: 'Thank you very much!',
-          targetText: 'Grazie mille!',
-          languageCode: 'it',
-          difficultyLevel: 'A1',
-          topicCategory: topicCategory,
-          grammarNotes: '“Mille” means a thousand, so thousands of thanks.',
+          grammarNotes: '“Bis morgen” means see you tomorrow.',
         ),
       ];
     } else if (code == 'fr') {
@@ -270,6 +247,51 @@ class LanguageUtils {
           topicCategory: topicCategory,
           grammarNotes: '“Beaucoup” means very much.',
         ),
+        SentencePair(
+          id: 'fr_fb_4',
+          sourceText: 'Where is the restaurant?',
+          targetText: 'Où est le restaurant ?',
+          languageCode: 'fr',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Où est” means where is.',
+        ),
+        SentencePair(
+          id: 'fr_fb_5',
+          sourceText: 'I would like a coffee, please.',
+          targetText: 'Je voudrais un café, s\'il vous plaît.',
+          languageCode: 'fr',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Je voudrais” is polite French for I would like.',
+        ),
+        SentencePair(
+          id: 'fr_fb_6',
+          sourceText: 'Goodbye, see you tomorrow!',
+          targetText: 'Au revoir, à demain !',
+          languageCode: 'fr',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“À demain” means see you tomorrow.',
+        ),
+        SentencePair(
+          id: 'fr_fb_7',
+          sourceText: 'Nice to meet you.',
+          targetText: 'Enchanté de faire votre connaissance.',
+          languageCode: 'fr',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Formal French greeting upon meeting someone.',
+        ),
+        SentencePair(
+          id: 'fr_fb_8',
+          sourceText: 'Have a nice day!',
+          targetText: 'Bonne journée !',
+          languageCode: 'fr',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Friendly daytime parting phrase.',
+        ),
       ];
     } else if (code == 'ro') {
       defaultPairs = [
@@ -300,6 +322,42 @@ class LanguageUtils {
           topicCategory: topicCategory,
           grammarNotes: 'Expressing gratitude in Romanian.',
         ),
+        SentencePair(
+          id: 'ro_fb_4',
+          sourceText: 'My name is Alex.',
+          targetText: 'Mă numesc Alex.',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Mă numesc” means I call myself.',
+        ),
+        SentencePair(
+          id: 'ro_fb_5',
+          sourceText: 'Where is the hotel?',
+          targetText: 'Unde este hotelul?',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Unde este” means where is.',
+        ),
+        SentencePair(
+          id: 'ro_fb_6',
+          sourceText: 'Goodbye, see you tomorrow!',
+          targetText: 'La revedere, pe mâine!',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Pe mâine” means see you tomorrow.',
+        ),
+        SentencePair(
+          id: 'ro_fb_7',
+          sourceText: 'Nice to meet you!',
+          targetText: 'Încântat de cunoștință!',
+          languageCode: 'ro',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Polite Romanian greeting.',
+        ),
       ];
     } else if (code == 'es') {
       defaultPairs = [
@@ -310,7 +368,7 @@ class LanguageUtils {
           languageCode: 'es',
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: '“¿Cómo estás?” is informal, used with friends in Spanish.',
+          grammarNotes: '“¿Cómo estás?” is informal in Spanish.',
         ),
         SentencePair(
           id: 'es_fb_2',
@@ -321,22 +379,148 @@ class LanguageUtils {
           topicCategory: topicCategory,
           grammarNotes: 'Used until midday in Spanish.',
         ),
+        SentencePair(
+          id: 'es_fb_3',
+          sourceText: 'My name is Alex.',
+          targetText: 'Me llamo Alex.',
+          languageCode: 'es',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Me llamo” means I call myself.',
+        ),
+        SentencePair(
+          id: 'es_fb_4',
+          sourceText: 'Thank you very much!',
+          targetText: '¡Muchas gracias!',
+          languageCode: 'es',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Expressing gratitude in Spanish.',
+        ),
+        SentencePair(
+          id: 'es_fb_5',
+          sourceText: 'Where is the beach?',
+          targetText: '¿Dónde está la playa?',
+          languageCode: 'es',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“¿Dónde está?” means where is.',
+        ),
+        SentencePair(
+          id: 'es_fb_6',
+          sourceText: 'Goodbye, see you tomorrow!',
+          targetText: '¡Hasta luego, hasta mañana!',
+          languageCode: 'es',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Common farewell in Spanish.',
+        ),
       ];
-    }
-
-    if (defaultPairs.length < limit) {
-      final extraCount = limit - defaultPairs.length;
-      for (int i = 0; i < extraCount; i++) {
-        defaultPairs.add(SentencePair(
-          id: 'fb_${code}_${defaultPairs.length + 1}',
-          sourceText: 'Sample phrase ${defaultPairs.length + 1} for $cleanTopic',
-          targetText: 'Phrase example ${defaultPairs.length + 1} for $cleanTopic ($targetLanguage)',
+    } else if (code == 'it') {
+      defaultPairs = [
+        SentencePair(
+          id: 'it_fb_1',
+          sourceText: 'Hello, how are you?',
+          targetText: 'Ciao, come stai?',
+          languageCode: 'it',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Come stai?” is informal in Italian.',
+        ),
+        SentencePair(
+          id: 'it_fb_2',
+          sourceText: 'Good morning!',
+          targetText: 'Buongiorno!',
+          languageCode: 'it',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Standard Italian morning greeting.',
+        ),
+        SentencePair(
+          id: 'it_fb_3',
+          sourceText: 'My name is Marco.',
+          targetText: 'Mi chiamo Marco.',
+          languageCode: 'it',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Mi chiamo” means I call myself.',
+        ),
+        SentencePair(
+          id: 'it_fb_4',
+          sourceText: 'Nice to meet you.',
+          targetText: 'Piacere di conoscerti.',
+          languageCode: 'it',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Polite Italian introduction.',
+        ),
+        SentencePair(
+          id: 'it_fb_5',
+          sourceText: 'Thank you very much!',
+          targetText: 'Grazie mille!',
+          languageCode: 'it',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Mille” means a thousand.',
+        ),
+        SentencePair(
+          id: 'it_fb_6',
+          sourceText: 'Where is the station?',
+          targetText: 'Dov\'è la stazione?',
+          languageCode: 'it',
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: '“Dov\'è” means where is.',
+        ),
+      ];
+    } else {
+      defaultPairs = [
+        SentencePair(
+          id: '${code}_fb_1',
+          sourceText: 'Hello, how are you?',
+          targetText: 'Hello, how are you?',
           languageCode: code,
           difficultyLevel: 'A1',
           topicCategory: topicCategory,
-          grammarNotes: 'Practice phrase for $cleanTopic in $targetLanguage.',
-        ));
-      }
+          grammarNotes: 'Standard greeting.',
+        ),
+        SentencePair(
+          id: '${code}_fb_2',
+          sourceText: 'Good morning!',
+          targetText: 'Good morning!',
+          languageCode: code,
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Morning greeting.',
+        ),
+        SentencePair(
+          id: '${code}_fb_3',
+          sourceText: 'Thank you very much!',
+          targetText: 'Thank you very much!',
+          languageCode: code,
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Expressing gratitude.',
+        ),
+        SentencePair(
+          id: '${code}_fb_4',
+          sourceText: 'My name is Alex.',
+          targetText: 'My name is Alex.',
+          languageCode: code,
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Personal introduction.',
+        ),
+        SentencePair(
+          id: '${code}_fb_5',
+          sourceText: 'Where is the nearest cafe?',
+          targetText: 'Where is the nearest cafe?',
+          languageCode: code,
+          difficultyLevel: 'A1',
+          topicCategory: topicCategory,
+          grammarNotes: 'Asking for directions.',
+        ),
+      ];
     }
 
     return defaultPairs.take(limit).toList();
