@@ -4,6 +4,16 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.7] - 2026-08-11
+
+### 📝 Localized Skill Tree Unit Descriptions (`translateDescription`)
+
+#### 💬 Unit Subtitle Localizations (`home_screen.dart` & `topic_translator.dart`)
+- **Dynamic Unit Description Lookup**: Wired `TopicTranslator.translateDescription(unitName, nativeLanguageCode)` into the Unit header cards on `HomeScreen`.
+- **Raw Lookup Key Integrity**: Ensured the original raw English unit name (e.g. `"Basics"`, `"Family & Home"`) is passed as the dictionary lookup key, ensuring exact translation matches across English, Romanian, French, German, and Spanish.
+
+---
+
 ## [v1.1.6] - 2026-08-11
 
 ### 🎯 Direct `translateUnit` & `translateNode` Skill Tree Integration

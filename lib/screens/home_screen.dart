@@ -536,7 +536,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    unit.description,
+                                    TopicTranslator.translateDescription(unit.unitName.trim(), nativeLangCode).isNotEmpty
+                                        ? TopicTranslator.translateDescription(unit.unitName.trim(), nativeLangCode)
+                                        : unit.description,
                                     style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 13,
