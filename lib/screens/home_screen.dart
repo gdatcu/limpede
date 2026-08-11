@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
+import '../providers/course_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../providers/topic_provider.dart';
+import '../utils/localized_strings.dart';
 import '../widgets/widgets.dart';
 import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
@@ -18,7 +20,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentTab = 0;
-  String _selectedLanguage = 'Spanish';
 
   void _openCustomLessonModal(BuildContext context) {
     showModalBottomSheet(
@@ -78,7 +79,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final theme = Theme.of(context);
     final userProfileAsync = ref.watch(currentUserProfileProvider);
     final dueCountAsync = ref.watch(dueSrsCountProvider);
-    final topicUnitsAsync = ref.watch(topicUnitsProvider(targetLanguage: _selectedLanguage));
+    final courseState = ref.watch(courseStateNotifierProvider);
+    final topicUnitsAsync = ref.watch(topicUnitsProvider(targetLanguage: courseState.targetLanguage));
     final updateInfoAsync = ref.watch(appUpdateInfoProvider);
 
     final dueCount = dueCountAsync.maybeWhen(
@@ -96,89 +98,132 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       orElse: () => 1,
     );
 
+    final nativeLang = courseState.nativeLanguage;
+    final targetLang = courseState.targetLanguage;
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: theme.colorScheme.surface,
-        title: Row(
-          children: [
-            // Target Language Dropdown Pill
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: theme.colorScheme.outlineVariant),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedLanguage,
-                  isDense: true,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  items: const [
-                    DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
-                    DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
-                    DropdownMenuItem(value: 'German', child: Text('🇩🇪 German')),
-                    DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
-                    DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Romanian')),
-                    DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
-                    DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
-                    DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
+        title: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              // Course Selector Pill: Native -> Target Language
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Native Language Selector
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: nativeLang,
+                        isDense: true,
+                        icon: const SizedBox.shrink(),
+                        items: const [
+                          DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
+                          DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Română')),
+                          DropdownMenuItem(value: 'French', child: Text('🇫🇷 Français')),
+                          DropdownMenuItem(value: 'German', child: Text('🇩🇪 Deutsch')),
+                          DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Español')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            ref.read(courseStateNotifierProvider.notifier).setNativeLanguage(val);
+                          }
+                        },
+                      ),
+                    ),
+
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Icon(Icons.arrow_forward_rounded, size: 18),
+                    ),
+
+                    // Target Language Selector
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: targetLang,
+                        isDense: true,
+                        icon: const Icon(Icons.arrow_drop_down),
+                        items: const [
+                          DropdownMenuItem(value: 'German', child: Text('🇩🇪 German')),
+                          DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
+                          DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
+                          DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
+                          DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
+                          DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Romanian')),
+                          DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
+                          DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
+                          DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            ref.read(courseStateNotifierProvider.notifier).setTargetLanguage(val);
+                          }
+                        },
+                      ),
+                    ),
                   ],
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() => _selectedLanguage = val);
-                    }
-                  },
                 ),
               ),
-            ),
-            const Spacer(),
-            // Streak Counter 🔥
-            Row(
-              children: [
-                const Icon(Icons.local_fire_department, color: Colors.orange, size: 24),
-                const SizedBox(width: 4),
-                Text(
-                  '$userStreak',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+
+              const SizedBox(width: 12),
+
+              // Streak Counter 🔥
+              Row(
+                children: [
+                  const Icon(Icons.local_fire_department, color: Colors.orange, size: 22),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$userStreak',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            // Hearts Counter ❤️
-            Row(
-              children: [
-                const Icon(Icons.favorite, color: Colors.redAccent, size: 24),
-                const SizedBox(width: 4),
-                Text(
-                  '5',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.redAccent,
+                ],
+              ),
+              const SizedBox(width: 12),
+
+              // Hearts Counter ❤️
+              Row(
+                children: [
+                  const Icon(Icons.favorite, color: Colors.redAccent, size: 22),
+                  const SizedBox(width: 4),
+                  Text(
+                    '5',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            // XP Counter ⚡
-            Row(
-              children: [
-                const Icon(Icons.bolt, color: Colors.amber, size: 24),
-                const SizedBox(width: 2),
-                Text(
-                  '$userXp',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber.shade700,
+                ],
+              ),
+              const SizedBox(width: 12),
+
+              // XP Counter ⚡
+              Row(
+                children: [
+                  const Icon(Icons.bolt, color: Colors.amber, size: 22),
+                  const SizedBox(width: 2),
+                  Text(
+                    '$userXp',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade700,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       body: CustomScrollView(
@@ -290,7 +335,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'SRS Daily Review',
+                              LocalizedStrings.getSrsReviewTitle(nativeLang),
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.onTertiaryContainer,
@@ -311,7 +356,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ElevatedButton(
                         onPressed: () {
                           context.push(
-                            '/lesson/${Uri.encodeComponent("SRS Review")}?language=$_selectedLanguage&isSrsReview=true',
+                            '/lesson/${Uri.encodeComponent("SRS Review")}?language=$targetLang&isSrsReview=true',
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -358,7 +403,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Custom Topic Helper',
+                              LocalizedStrings.getCustomTopicTitle(nativeLang),
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.onPrimaryContainer,
@@ -520,7 +565,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               xOffset: xOffset,
                               onTap: () {
                                 context.push(
-                                  '/lesson/${Uri.encodeComponent(topicNode.fullCategory)}?language=$_selectedLanguage',
+                                  '/lesson/${Uri.encodeComponent(topicNode.fullCategory)}?language=$targetLang',
                                 );
                               },
                             ),

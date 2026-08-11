@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'auth_provider.dart';
+import 'course_provider.dart';
 import 'user_provider.dart';
 
 part 'topic_provider.g.dart';
@@ -46,15 +47,17 @@ Future<List<TopicUnit>> topicUnits(
   required String targetLanguage,
 }) async {
   final supabaseService = ref.watch(supabaseServiceProvider);
+  final courseState = ref.watch(courseStateNotifierProvider);
   final completedTopicsAsync = ref.watch(completedTopicsProvider);
   final completedTopics = completedTopicsAsync.maybeWhen(
     data: (set) => set,
     orElse: () => <String>{},
   );
 
-  // Fetch all categories dynamically present in Supabase for this language
+  // Fetch categories dynamically present in Supabase for the active course query language
+  final queryLang = courseState.queryLanguageCode;
   final rawDbCategories = await supabaseService.fetchTopicCategories(
-    targetLanguage: targetLanguage,
+    targetLanguage: queryLang,
   );
 
   final List<Map<String, dynamic>> masterUnitsData = [

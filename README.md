@@ -10,6 +10,7 @@ A gamified, deterministic language learning app built with **Flutter**, **Riverp
 - 🗄️ **Supabase Integration with Offline Fallback**: Real-time database sync for `sentence_pairs` and `srs_review_items`. If offline or unauthenticated, seamlessly falls back to local sentence decks.
 - 🤖 **Demoted AI Assistant (Gemini Flash)**: Core learning path is 100% deterministic with zero AI calls during regular gameplay. Gemini AI is demoted to an on-demand **"Why is this wrong?"** modal (`GrammarExplainSheet`) after incorrect answers.
 - 🗺️ **Dynamic Supabase Skill Tree**: Duolingo-style serpentine path dynamically constructed from distinct `topic_category` database values, grouped into Units with contextual icons, completion tracking, XP awards, and daily streak counters.
+- 🔄 **Virtual Reverse Decks & Native Localizations**: Dual `Native Language ➔ Target Language` course state (`course_provider.dart`). Allows non-English speakers (e.g. Romanian, French, German, Spanish) to learn English via virtual sentence swapping (`isReverseMode`) with native UI prompts.
 - 🔊 **Native Text-to-Speech (TTS)**: Instant voice pronunciation audio for Spanish, French, German, Japanese, and custom target languages.
 - 🧠 **High-Speed Semantic Categorization**: `semantic_categorizer.py` batch pipeline utilizing MiniLM sentence embeddings to automatically classify sentence pairs into Duolingo-style micro-topics.
 - 🔄 **GitHub Releases & Auto-Update**: In-app update detector (`UpdateService`) checking GitHub's API for new releases with one-tap APK download prompts.

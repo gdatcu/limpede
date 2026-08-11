@@ -4,6 +4,24 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.0] - 2026-08-11
+
+### 🔄 Virtual Reverse Decks & Native UI Localizations
+
+#### 🎓 Course State Provider (`course_provider.dart`)
+- **Multi-Directional Learning**: Created `courseStateNotifierProvider` supporting native language selection (`English`, `Romanian`, `French`, `German`, `Spanish`) and target language selection.
+- **Virtual Reverse Swap Logic**: Automatically detects `isReverseMode` when non-English speakers learn English (e.g. `Romanian ➔ English`), routing database queries to native language entries without database duplication.
+
+#### 🌐 Native UI Localizations (`localized_strings.dart`)
+- **Multi-Language UI Prompts**: Added lightweight localizations for instruction headers, action buttons, and status messages across 9 languages (English, Romanian, French, German, Spanish, Italian, Portuguese, Russian, Japanese).
+- **Dynamic Header Instruction**: Instruction titles dynamically format per native language (e.g. *"Translate into German:"* ➔ *"Traduceți în engleză:"* ➔ *"Traduisez en anglais :"*).
+
+#### 📱 HomeScreen Header Course Selector & Lesson Engine
+- **Course Direction Selector**: Updated `HomeScreen` header pill displaying active course direction (e.g. `🇷🇴 Română ➔ 🇬🇧 English`).
+- **Virtual Reverse Exercise Execution**: `LessonScreen` dynamically swaps prompts and target answers during reverse mode, displaying native language questions, expecting English answers, and drawing distractors from English sentence pools.
+
+---
+
 ## [v1.0.9] - 2026-08-11
 
 ### 🐛 Cross-Language SRS Leak Fix & Native Italian Deck Fallbacks

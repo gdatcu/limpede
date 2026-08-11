@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../models/srs_models.dart';
+import '../providers/course_provider.dart';
 import '../providers/feedback_provider.dart';
 import '../providers/lesson_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../utils/language_utils.dart';
+import '../utils/localized_strings.dart';
 import '../widgets/widgets.dart';
 
 class LessonScreen extends ConsumerStatefulWidget {
@@ -47,24 +49,33 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     });
   }
 
-  void _generateOptions(SentencePair currentPair, List<SentencePair> deck) {
+  void _generateOptions({
+    required SentencePair currentPair,
+    required List<SentencePair> deck,
+    required bool isReverseMode,
+    required String nativeLanguage,
+    required String targetLanguage,
+  }) {
     if (_currentOptions.isNotEmpty) return;
 
-    final Set<String> optionsSet = {currentPair.targetText};
+    final String correctAnswer = isReverseMode ? currentPair.sourceText : currentPair.targetText;
+    final Set<String> optionsSet = {correctAnswer};
 
-    // Add targetTexts from other items in deck
     for (var p in deck) {
-      if (p.targetText != currentPair.targetText) {
-        optionsSet.add(p.targetText);
+      final text = isReverseMode ? p.sourceText : p.targetText;
+      if (text != correctAnswer) {
+        optionsSet.add(text);
       }
       if (optionsSet.length >= 4) break;
     }
 
-    // Add fallback options for the current target language
-    final fallbacks = LanguageUtils.getFallbackDistractors(widget.targetLanguage);
+    final fallbacks = isReverseMode
+        ? ['Hello, how are you?', 'Good morning!', 'Thank you very much!', 'Nice to meet you', 'See you tomorrow!']
+        : LanguageUtils.getFallbackDistractors(targetLanguage);
+
     for (var f in fallbacks) {
       if (optionsSet.length >= 4) break;
-      if (f != currentPair.targetText) optionsSet.add(f);
+      if (f != correctAnswer) optionsSet.add(f);
     }
 
     final list = optionsSet.toList();
@@ -72,12 +83,12 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     _currentOptions = list;
   }
 
-  void _speakText(String text) {
+  void _speakText(String text, String language) {
     final tts = ref.read(ttsServiceProvider);
-    tts.speak(text: text, targetLanguage: widget.targetLanguage);
+    tts.speak(text: text, targetLanguage: language);
   }
 
-  void _openGrammarExplainSheet(SentencePair pair, String userAnswer) {
+  void _openGrammarExplainSheet(SentencePair pair, String userAnswer, String targetLanguage) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -86,16 +97,16 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
         sourceText: pair.sourceText,
         targetText: pair.targetText,
         userAnswer: userAnswer,
-        targetLanguage: widget.targetLanguage,
+        targetLanguage: targetLanguage,
       ),
     );
   }
 
-  void _handleAnswer(SentencePair pair) {
+  void _handleAnswer(SentencePair pair, bool isReverseMode) {
     if (_selectedOption == null) return;
 
-    final isCorrect = _selectedOption!.trim().toLowerCase() ==
-        pair.targetText.trim().toLowerCase();
+    final String correctAnswer = isReverseMode ? pair.sourceText : pair.targetText;
+    final isCorrect = _selectedOption!.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
 
     final feedback = ref.read(feedbackServiceProvider);
 
@@ -107,7 +118,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       feedback.playCorrectFeedback();
       ref.read(srsLessonControllerProvider.notifier).recordAnswer(
             sentencePair: pair,
-            grade: 5, // Perfect score in SM-2
+            grade: 5,
           );
     } else {
       feedback.playWrongFeedback();
@@ -116,46 +127,45 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       }
       ref.read(srsLessonControllerProvider.notifier).recordAnswer(
             sentencePair: pair,
-            grade: 0, // Fail score in SM-2
+            grade: 0,
           );
     }
   }
 
-  void _nextExercise(int totalPairs) {
-    if (_currentIndex + 1 >= totalPairs) {
-      // Finish Lesson
+  void _nextChallenge(int totalItems) {
+    if (_currentIndex + 1 >= totalItems) {
       if (!_hasCompletedLesson) {
         _hasCompletedLesson = true;
         ref.read(srsLessonControllerProvider.notifier).finishLesson(
               topic: widget.lessonId,
-              xpEarned: 25,
             );
       }
-      setState(() => _currentIndex++);
-    } else {
-      setState(() {
-        _currentIndex++;
-        _selectedOption = null;
-        _hasSubmitted = false;
-        _currentOptions = [];
-      });
     }
+
+    setState(() {
+      _currentIndex++;
+      _selectedOption = null;
+      _hasSubmitted = false;
+      _currentOptions = [];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final deckAsync = ref.watch(srsLessonControllerProvider);
+    final courseState = ref.watch(courseStateNotifierProvider);
+    final isReverseMode = courseState.isReverseMode;
+    final nativeLang = courseState.nativeLanguage;
+    final targetLang = courseState.targetLanguage;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.isSrsReview ? 'SRS Daily Review' : widget.lessonId,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
+          widget.lessonId,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           Row(
@@ -164,9 +174,8 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
               const SizedBox(width: 4),
               Text(
                 '$_hearts',
-                style: const TextStyle(
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
                   color: Colors.redAccent,
                 ),
               ),
@@ -195,12 +204,26 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
             }
 
             final currentPair = pairs[_currentIndex];
-            _generateOptions(currentPair, pairs);
+            _generateOptions(
+              currentPair: currentPair,
+              deck: pairs,
+              isReverseMode: isReverseMode,
+              nativeLanguage: nativeLang,
+              targetLanguage: targetLang,
+            );
 
             final progress = (_currentIndex + 1) / pairs.length;
+            final String correctAnswer = isReverseMode ? currentPair.sourceText : currentPair.targetText;
+            final String promptText = isReverseMode ? currentPair.targetText : currentPair.sourceText;
+            final String promptSpeakerLang = isReverseMode ? nativeLang : targetLang;
+
             final isCorrect = _hasSubmitted &&
-                _selectedOption?.trim().toLowerCase() ==
-                    currentPair.targetText.trim().toLowerCase();
+                _selectedOption?.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
+
+            final headerText = LocalizedStrings.getTranslateInto(
+              nativeLanguage: nativeLang,
+              targetLanguage: targetLang,
+            );
 
             return Padding(
               padding: const EdgeInsets.all(24.0),
@@ -260,13 +283,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                                   size: 26,
                                 ),
                                 tooltip: 'Listen Pronunciation',
-                                onPressed: () => _speakText(currentPair.targetText),
+                                onPressed: () => _speakText(promptText, promptSpeakerLang),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Translate into ${widget.targetLanguage}:',
+                            headerText,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.onSurfaceVariant,
@@ -274,7 +297,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            currentPair.sourceText,
+                            promptText,
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -306,7 +329,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                         final option = _currentOptions[idx];
                         final isSelected = _selectedOption == option;
                         final isThisCorrect =
-                            option.trim().toLowerCase() == currentPair.targetText.trim().toLowerCase();
+                            option.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
 
                         Color borderClr = theme.colorScheme.outlineVariant;
                         Color bgClr = theme.colorScheme.surface;
@@ -324,38 +347,27 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                           bgClr = theme.colorScheme.primaryContainer.withValues(alpha: 0.3);
                         }
 
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          child: InkWell(
-                            onTap: _hasSubmitted
-                                ? null
-                                : () {
-                                    setState(() => _selectedOption = option);
-                                  },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: bgClr,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: borderClr, width: isSelected ? 2 : 1),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      option,
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight:
-                                            isSelected ? FontWeight.bold : FontWeight.normal,
-                                      ),
-                                    ),
-                                  ),
-                                  if (_hasSubmitted && isThisCorrect)
-                                    const Icon(Icons.check_circle, color: Colors.green)
-                                  else if (_hasSubmitted && isSelected && !isThisCorrect)
-                                    const Icon(Icons.cancel, color: Colors.red),
-                                ],
+                        return OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 18,
+                            ),
+                            side: BorderSide(color: borderClr, width: 2),
+                            backgroundColor: bgClr,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                          onPressed: _hasSubmitted
+                              ? null
+                              : () => setState(() => _selectedOption = option),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              option,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                               ),
                             ),
                           ),
@@ -364,56 +376,98 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                     ),
                   ),
 
-                  // On-demand AI "Why is this wrong?" button when submitted & wrong
-                  if (_hasSubmitted && !isCorrect) ...[
-                    Align(
-                      alignment: Alignment.center,
-                      child: TextButton.icon(
-                        onPressed: () => _openGrammarExplainSheet(
-                          currentPair,
-                          _selectedOption ?? '',
-                        ),
-                        icon: const Icon(Icons.auto_awesome, color: Colors.purple),
-                        label: const Text(
-                          'Why is this wrong?',
-                          style: TextStyle(
-                            color: Colors.purple,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  // Feedback Banner & Action Buttons
+                  if (_hasSubmitted) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isCorrect
+                            ? Colors.green.withValues(alpha: 0.15)
+                            : Colors.red.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isCorrect ? Colors.green : Colors.red,
                         ),
                       ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isCorrect
+                                      ? LocalizedStrings.getExcellent(nativeLang)
+                                      : LocalizedStrings.getIncorrect(nativeLang),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                  ),
+                                ),
+                                if (!isCorrect) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Correct answer: $correctAnswer',
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          if (!isCorrect)
+                            IconButton(
+                              icon: const Icon(Icons.help_outline_rounded),
+                              tooltip: 'Explain My Mistake',
+                              onPressed: () => _openGrammarExplainSheet(
+                                currentPair,
+                                _selectedOption ?? '',
+                                targetLang,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                   ],
 
-                  // Check / Next Action Button
                   ElevatedButton(
-                    onPressed: _selectedOption == null
-                        ? null
-                        : () {
-                            if (_hasSubmitted) {
-                              _nextExercise(pairs.length);
-                            } else {
-                              _handleAnswer(currentPair);
-                            }
-                          },
                     style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(18),
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
+                    onPressed: _selectedOption == null
+                        ? null
+                        : () {
+                            if (!_hasSubmitted) {
+                              _handleAnswer(currentPair, isReverseMode);
+                            } else {
+                              _nextChallenge(pairs.length);
+                            }
+                          },
                     child: Text(
-                      _hasSubmitted ? 'Continue' : 'Check Answer',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      !_hasSubmitted
+                          ? LocalizedStrings.getCheckAnswer(nativeLang)
+                          : LocalizedStrings.getContinue(nativeLang),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
               ),
             );
-
           },
         ),
       ),
@@ -423,48 +477,15 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   Widget _buildBouncingLoadingState(ThemeData theme) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          CircularProgressIndicator(color: theme.colorScheme.primary),
+          const CircularProgressIndicator(),
           const SizedBox(height: 16),
           Text(
-            'Loading SRS Decks...',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            'Preparing your lesson microlesson...',
+            style: theme.textTheme.bodyMedium,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyDeckState(BuildContext context, ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.sentiment_satisfied_alt, size: 64, color: Colors.amber),
-            const SizedBox(height: 16),
-            Text(
-              'No Due SRS Reviews!',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'You are all caught up on your spaced repetition reviews for today.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => context.pop(),
-              child: const Text('Back to Lessons'),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -474,26 +495,48 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Failed to load lesson deck',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              'Unable to load lesson.',
+              style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              '$err',
+              err.toString(),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.pop(),
-              child: const Text('Go Back'),
+              child: const Text('Back to Home'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyDeckState(BuildContext context, ThemeData theme) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.inbox_outlined, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              'No items available for this topic.',
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => context.pop(),
+              child: const Text('Back to Home'),
             ),
           ],
         ),
@@ -506,30 +549,27 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.heart_broken_rounded, size: 72, color: Colors.redAccent),
+            const Icon(Icons.heart_broken_rounded, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Out of Hearts!',
-              style: theme.textTheme.headlineSmall?.copyWith(
+              style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.redAccent,
+                color: Colors.red,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Take a short break to review your mistakes and restore your energy.',
+            Text(
+              'Review SRS items or try again tomorrow to refill hearts.',
               textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Return to Home'),
+              child: const Text('Return to Skill Tree'),
             ),
           ],
         ),
@@ -542,38 +582,31 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.military_tech_rounded, size: 88, color: Colors.amber),
+            const Icon(Icons.stars_rounded, size: 80, color: Colors.amber),
             const SizedBox(height: 16),
             Text(
               'Lesson Completed!',
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              '+25 XP Earned • SRS Intervals Updated!',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Colors.amber.shade800,
-              ),
+              'You earned +25 XP! Great job mastering this microlesson.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
             ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () => context.pop(),
-              icon: const Icon(Icons.check),
-              label: const Text('Continue'),
+            const SizedBox(height: 24),
+            ElevatedButton(
               style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
               ),
+              onPressed: () => context.pop(),
+              child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
