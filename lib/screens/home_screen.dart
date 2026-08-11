@@ -38,12 +38,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return sequence[index % sequence.length];
   }
 
-  List<DropdownMenuItem<String>> _buildNativeLanguageItems(String targetLang) {
-    if (targetLang != 'English') {
-      return const [
-        DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
-      ];
-    }
+  List<DropdownMenuItem<String>> _buildNativeLanguageItems() {
     return const [
       DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
       DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Română')),
@@ -53,14 +48,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ];
   }
 
-  List<DropdownMenuItem<String>> _buildTargetLanguageItems(String nativeLang) {
-    if (nativeLang != 'English') {
-      return const [
-        DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
-      ];
-    }
+  List<DropdownMenuItem<String>> _buildTargetLanguageItems() {
     return const [
       DropdownMenuItem(value: 'German', child: Text('🇩🇪 German')),
+      DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
       DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
       DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
       DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
@@ -159,7 +150,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         value: nativeLang,
                         isDense: true,
                         icon: const SizedBox.shrink(),
-                        items: _buildNativeLanguageItems(targetLang),
+                        items: _buildNativeLanguageItems(),
                         onChanged: (val) {
                           if (val != null) {
                             ref.read(courseStateNotifierProvider.notifier).setNativeLanguage(val);
@@ -179,7 +170,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         value: targetLang,
                         isDense: true,
                         icon: const Icon(Icons.arrow_drop_down),
-                        items: _buildTargetLanguageItems(nativeLang),
+                        items: _buildTargetLanguageItems(),
                         onChanged: (val) {
                           if (val != null) {
                             ref.read(courseStateNotifierProvider.notifier).setTargetLanguage(val);

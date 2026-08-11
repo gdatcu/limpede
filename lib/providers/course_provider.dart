@@ -52,10 +52,10 @@ class CourseStateNotifier extends _$CourseStateNotifier {
     if (lang == state.nativeLanguage) return;
     String newTarget = state.targetLanguage;
     if (lang != 'English') {
-      // Non-English native speaker can ONLY learn English (Foreign -> English reverse mode)
+      // If user chooses a non-English native language, auto-correct target to English
       newTarget = 'English';
     } else if (newTarget == 'English') {
-      // Native is English, target was English -> set default foreign target
+      // If native language is reset to English and target was English, default target to German
       newTarget = 'German';
     }
     state = CourseState(
@@ -68,10 +68,10 @@ class CourseStateNotifier extends _$CourseStateNotifier {
     if (lang == state.targetLanguage) return;
     String newNative = state.nativeLanguage;
     if (lang != 'English') {
-      // Learning a foreign language requires native language to be English
+      // If user chooses a non-English target language, auto-correct native to English
       newNative = 'English';
     } else if (newNative == 'English') {
-      // Target is English, native was English -> set default foreign native (e.g. Romanian)
+      // If target is set to English and native was English, default native to Romanian for Reverse Mode
       newNative = 'Romanian';
     }
     state = CourseState(
@@ -81,7 +81,6 @@ class CourseStateNotifier extends _$CourseStateNotifier {
   }
 
   void setCourse({required String nativeLanguage, required String targetLanguage}) {
-    // Validate constraint: either nativeLanguage == 'English' or targetLanguage == 'English'
     if (nativeLanguage != 'English' && targetLanguage != 'English') {
       state = CourseState(
         nativeLanguage: nativeLanguage,

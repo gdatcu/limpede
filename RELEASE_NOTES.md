@@ -4,6 +4,18 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.1.2] - 2026-08-11
+
+### 🎨 Language Selector Unfiltered Dropdowns & Auto-Correction UX
+
+#### 🔓 Full Dropdown Options Visibility (`home_screen.dart`)
+- **Unfiltered Language Lists**: Restored complete, unrestricted language lists to both `NativeLanguage` and `TargetLanguage` dropdown selectors, ensuring no options are hidden.
+
+#### ⚡ Auto-Correcting Course State Logic (`course_provider.dart`)
+- **Frictionless Mode Switch**: When selecting a non-English `NativeLanguage`, `TargetLanguage` automatically updates to `English` (triggering Reverse Deck mode). When selecting a non-English `TargetLanguage`, `NativeLanguage` automatically updates to `English`.
+
+---
+
 ## [v1.1.1] - 2026-08-11
 
 ### 🛠️ Language Pair Validation & Reverse Supabase Query Fix
