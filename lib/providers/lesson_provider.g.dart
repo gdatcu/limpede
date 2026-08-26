@@ -40,38 +40,5 @@ final lessonCacheServiceProvider = Provider<LessonCacheService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LessonCacheServiceRef = ProviderRef<LessonCacheService>;
-String _$geminiServiceHash() => r'd30ece1b9081923399ad70fe596fb5f153a7e956';
-
-/// See also [geminiService].
-@ProviderFor(geminiService)
-final geminiServiceProvider = Provider<GeminiService>.internal(
-  geminiService,
-  name: r'geminiServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$geminiServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GeminiServiceRef = ProviderRef<GeminiService>;
-String _$lessonControllerHash() => r'd2f41a45d66630deeedf2211e69eb70bcbe2b5ef';
-
-/// See also [LessonController].
-@ProviderFor(LessonController)
-final lessonControllerProvider =
-    NotifierProvider<LessonController, AsyncValue<List<LessonBlock>>>.internal(
-  LessonController.new,
-  name: r'lessonControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$lessonControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$LessonController = Notifier<AsyncValue<List<LessonBlock>>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

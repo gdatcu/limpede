@@ -35,13 +35,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           cp .env.example .env
           if [ -n "$SUPABASE_URL" ]; then echo "SUPABASE_URL=$SUPABASE_URL" > .env; fi
           if [ -n "$SUPABASE_ANON_KEY" ]; then echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" >> .env; fi
-          if [ -n "$GEMINI_API_KEY" ]; then echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env; fi
-
 
       - name: Run Build Runner
         run: flutter pub run build_runner build --delete-conflicting-outputs
@@ -59,8 +56,8 @@ jobs:
           name: Limpede ${{ github.ref_name }}
           body: |
             ## 🚀 Limpede Release ${{ github.ref_name }}
-            - Deterministic SRS language learning engine powered by Supabase.
-            - On-demand Gemini AI grammar helper.
+            - Deterministic SM-2 SRS language learning engine powered by Supabase.
+            - Dynamic localized skill tree paths and native pronunciation.
             - Download `app-release.apk` below to install or update Limpede on your Android device!
           draft: false
           prerelease: false

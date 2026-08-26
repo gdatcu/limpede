@@ -1,6 +1,6 @@
 # Limpede ⚡💧
 
-A gamified, deterministic language learning app built with **Flutter**, **Riverpod**, and **Supabase**, featuring an **SM-2 Spaced Repetition System (SRS)** engine and an on-demand **Gemini AI** grammar breakdown coach.
+A gamified, 100% deterministic language learning app built with **Flutter**, **Riverpod**, and **Supabase**, featuring an **SM-2 Spaced Repetition System (SRS)** engine.
 
 ---
 
@@ -8,7 +8,6 @@ A gamified, deterministic language learning app built with **Flutter**, **Riverp
 
 - ⚡ **Deterministic Spaced Repetition System (SRS)**: Powered by the SuperMemo-2 (SM-2) algorithm. Calculates ease factors, review intervals, and next review dates based on user performance grades (0 = fail to 5 = perfect).
 - 🗄️ **Supabase Integration with Offline Fallback**: Real-time database sync for `sentence_pairs` and `srs_review_items`. If offline or unauthenticated, seamlessly falls back to local sentence decks.
-- 🤖 **Demoted AI Assistant (Gemini Flash)**: Core learning path is 100% deterministic with zero AI calls during regular gameplay. Gemini AI is demoted to an on-demand **"Why is this wrong?"** modal (`GrammarExplainSheet`) after incorrect answers.
 - 🗺️ **Dynamic Supabase Skill Tree**: Duolingo-style serpentine path dynamically constructed from distinct `topic_category` database values, grouped into Units with contextual icons, completion tracking, XP awards, and daily streak counters.
 - 🔄 **Virtual Reverse Decks & Native Localizations**: Dual `Native Language ➔ Target Language` course state (`course_provider.dart`). Allows non-English speakers (e.g. Romanian, French, German, Spanish) to learn English via virtual sentence swapping (`isReverseMode`) with native UI prompts.
 - 🔊 **Native Text-to-Speech (TTS)**: Instant voice pronunciation audio for Spanish, French, German, Japanese, and custom target languages.
@@ -26,7 +25,6 @@ A gamified, deterministic language learning app built with **Flutter**, **Riverp
 - **Database & Auth:** Supabase (`supabase_flutter`)
 - **Routing:** GoRouter (`go_router`)
 - **Audio & TTS:** `audioplayers`, `flutter_tts`
-- **AI Engine:** Google AI Studio (Gemini Flash 2.5 API via `http`)
 - **Design System:** Material 3 (Flat, gamified design with dark mode support)
 
 ---
@@ -55,7 +53,6 @@ Copy `.env.example` to `.env` and fill in your credentials:
 ```env
 SUPABASE_URL=https://your-supabase-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
-GEMINI_API_KEY=your-gemini-api-key
 ```
 
 ### 3. Run Development Server

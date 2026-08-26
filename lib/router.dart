@@ -65,12 +65,10 @@ final GoRouter router = GoRouter(
       builder: (BuildContext context, GoRouterState state) {
         final lessonId = state.pathParameters['id'] ?? 'default';
         final targetLanguage = state.uri.queryParameters['language'] ?? 'Spanish';
-        final isAi = state.uri.queryParameters['isAi'] == 'true';
         final isSrsReview = state.uri.queryParameters['isSrsReview'] == 'true';
         return LessonScreen(
           lessonId: lessonId,
           targetLanguage: targetLanguage,
-          isCustomAiTopic: isAi,
           isSrsReview: isSrsReview,
         );
       },

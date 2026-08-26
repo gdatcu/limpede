@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.2.0] - 2026-08-26
+
+### 🧹 Complete Removal of AI Assistant & Gemini Dependencies
+
+#### 🚫 Elimination of Gemini AI & External LLMs
+- **Purged AI Services**: Completely deleted `gemini_service.dart`, `grammar_explain_sheet.dart`, and `generate_lesson_sheet.dart`.
+- **Removed AI SDK**: Removed `google_generative_ai` dependency from `pubspec.yaml`.
+- **Purged Environment Keys**: Removed `GEMINI_API_KEY` from `env_service.dart`, `.env`, `.env.example`, and CI/CD release workflow (`release.yml`).
+- **Cleaned UI & Navigation**: Removed "Explain My Mistake" sheets and custom AI generation sheets from `lesson_screen.dart` and `router.dart`.
+- **100% Deterministic SM-2 SRS Engine**: App now runs entirely on pure deterministic Supabase database queries and local offline sentence catalogs with zero external AI failure points.
+
+---
+
 ## [v1.1.7] - 2026-08-11
 
 ### 📝 Localized Skill Tree Unit Descriptions (`translateDescription`)

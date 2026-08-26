@@ -15,14 +15,12 @@ import '../widgets/widgets.dart';
 class LessonScreen extends ConsumerStatefulWidget {
   final String lessonId;
   final String targetLanguage;
-  final bool isCustomAiTopic;
   final bool isSrsReview;
 
   const LessonScreen({
     super.key,
     required this.lessonId,
     this.targetLanguage = 'Spanish',
-    this.isCustomAiTopic = false,
     this.isSrsReview = false,
   });
 
@@ -87,20 +85,6 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   void _speakText(String text, String language) {
     final tts = ref.read(ttsServiceProvider);
     tts.speak(text: text, targetLanguage: language);
-  }
-
-  void _openGrammarExplainSheet(SentencePair pair, String userAnswer, String targetLanguage) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => GrammarExplainSheet(
-        sourceText: pair.sourceText,
-        targetText: pair.targetText,
-        userAnswer: userAnswer,
-        targetLanguage: targetLanguage,
-      ),
-    );
   }
 
   void _handleAnswer(SentencePair pair, bool isReverseMode) {
@@ -422,16 +406,6 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                               ],
                             ),
                           ),
-                          if (!isCorrect)
-                            IconButton(
-                              icon: const Icon(Icons.help_outline_rounded),
-                              tooltip: 'Explain My Mistake',
-                              onPressed: () => _openGrammarExplainSheet(
-                                currentPair,
-                                _selectedOption ?? '',
-                                targetLang,
-                              ),
-                            ),
                         ],
                       ),
                     ),

@@ -18,11 +18,4 @@ abstract class Env {
     optional: true,
   )
   static const String supabaseAnonKey = _Env.supabaseAnonKey;
-
-  @EnviedField(
-    varName: 'GEMINI_API_KEY',
-    defaultValue: '',
-    optional: true,
-  )
-  static const String geminiApiKey = _Env.geminiApiKey;
 }

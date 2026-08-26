@@ -7,13 +7,11 @@
 *   **Database & Auth:** Supabase (`supabase_flutter`)
 *   **Routing:** GoRouter (`go_router`)
 *   **Audio & TTS:** `audioplayers`, `flutter_tts`
-*   **AI Engine (Optional Helper Only):** Google AI Studio (Gemini Flash API via `google_generative_ai`)
 *   **Design System:** Material 3 (Flat, gamified design, high use of rounded corners and animations)
 
-## 2. Core Architecture: Deterministic Database & SRS Engine
-*   **No AI in Core Path:** Never use AI to generate core curriculum lessons or standard exercise paths. All lesson content (`sentence_pairs`, `vocabulary`) must be served directly from Supabase tables or local offline catalogs.
+## 2. Core Architecture: 100% Deterministic Database & SRS Engine
+*   **Zero AI Dependencies:** The application is 100% deterministic and offline-resilient. All lesson content (`sentence_pairs`, `vocabulary`) is served directly from Supabase tables or local offline catalogs.
 *   **Spaced Repetition System (SRS):** Core learning uses an SM-2 based SRS algorithm. Review queues prioritize items the user previously answered incorrectly or items due for review.
-*   **Demoted AI Role:** The Gemini API is strictly restricted to an on-demand, secondary assistant (e.g., an "Explain My Mistake" or "Grammar Breakdown" sheet triggered manually by the user).
 
 ## 3. Core Rules & Philosophy
 *   **Widget Composition:** Extract reusable UI components into `lib/widgets/`. Keep files modular and under 300 lines.
@@ -30,15 +28,15 @@
 *   Use Supabase Realtime to sync friend leaderboards.
 
 ### ❌ Not Allowed
-*   Do NOT depend on Gemini or any AI API to generate core lessons or exercise steps.
+*   Do NOT add or depend on external LLM/AI APIs.
 *   Do NOT allow unhandled network exceptions or API timeouts to block UI navigation.
-*   Do NOT write inline database or API calls in UI screens.
+*   Do NOT write inline database calls in UI screens.
 *   Do NOT hardcode secrets or keys; read them from `.env`.
 
 ## 5. Development Workflow
 1.  **Models & Schema:** Define `freezed` Dart models for deterministic content (`SentencePair`, `SrsItem`).
 2.  **Engine & Providers:** Implement local SRS scheduling logic and Supabase fetch repositories wrapped in Riverpod providers.
-3.  **UI Integration:** Connect screens to SRS providers and wire up the optional "Explain My Mistake" AI sheet on result screens.
+3.  **UI Integration:** Connect screens to SRS providers with rich interactive exercise modalities (Multiple Choice, Sentence Builder, Matching Pairs).
 
 ## 6. Documentation & Release Maintenance Protocol
 *   **Continuous Maintenance:** Whenever a new feature, bug fix, or architectural modification is added, you MUST update `README.md` and append/update an entry in `RELEASE_NOTES.md` under the version header (`## [vX.Y.Z] - YYYY-MM-DD`).
