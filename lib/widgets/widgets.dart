@@ -8,4 +8,6 @@ export 'gem_shop_sheet.dart';
 export 'interactive_hint_sentence.dart';
 export 'pronunciation_exercise_widget.dart';
 export 'listening_exercise_widget.dart';
+export 'guidebook_sheet.dart';
+
 

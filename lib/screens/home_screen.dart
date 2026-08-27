@@ -9,6 +9,7 @@ import '../providers/topic_provider.dart';
 import '../utils/language_utils.dart';
 import '../utils/localized_strings.dart';
 import '../utils/topic_translator.dart';
+import '../services/guidebook_service.dart';
 import '../widgets/widgets.dart';
 import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
@@ -540,20 +541,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ],
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Text(
-                                unit.levelBadge,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    unit.levelBadge,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(height: 10),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    final guidebook = GuidebookService.getGuidebook(
+                                      unitNumber: unit.unitNumber,
+                                      targetLanguage: targetLang,
+                                      nativeLanguage: nativeLang,
+                                    );
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (context) => GuidebookSheet(
+                                        guidebook: guidebook,
+                                        targetLanguage: targetLang,
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: theme.colorScheme.primary,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.menu_book_rounded, size: 18),
+                                  label: const Text(
+                                    'Guidebook',
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

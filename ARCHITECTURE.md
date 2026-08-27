@@ -240,6 +240,9 @@ limpede/
 - **🎙️ Spoken Pronunciation Drills** ([`pronunciation_exercise_widget.dart`](lib/widgets/pronunciation_exercise_widget.dart)): Interactive speech evaluation using `SpeechRecognitionService` with diacritic-normalized Levenshtein string distance and fuzzy word matching ($0-100\%$ accuracy meter).
 - **🔤 Tappable Word Hints (Tooltips)** ([`interactive_hint_sentence.dart`](lib/widgets/interactive_hint_sentence.dart)): Tokenizes sentence prompts into inline word spans with dashed underlines; tapping a word reveals its localized translation, part of speech, and lemma via `DictionaryService`.
 - **👂 Audio-Only Listening Comprehension** ([`listening_exercise_widget.dart`](lib/widgets/listening_exercise_widget.dart)): "Tap what you hear" drills where prompt text is concealed, auto-playing target TTS audio on mount with word-tile reconstruction.
+- **Unit Grammar Guidebooks (📖)** ([`guidebook_sheet.dart`](lib/widgets/guidebook_sheet.dart) & [`guidebook_service.dart`](lib/services/guidebook_service.dart)):
+  - Dedicated **Guidebook 📖** button on each Unit Header in the Skill Tree (`HomeScreen`).
+  - Comprehensive, structured grammar explanations, Key Phrases with audio (🔊 standard and 🐢 slow-speed), verb conjugation tables, and common pitfall tips.
 - **Sentence Builder Drill** ([`sentence_builder_widget.dart`](lib/widgets/sentence_builder_widget.dart)): Interactive tap-to-assemble word tile banks with slotting animation.
 - **Matching Pairs Drill** ([`matching_pairs_widget.dart`](lib/widgets/matching_pairs_widget.dart)): Two-column vocabulary tap-to-match exercises with instant color-coded matching states.
 - **Multiple Choice Questions**: Dynamically generated 4-option questions with authentic distractors pulled from active sentence decks.

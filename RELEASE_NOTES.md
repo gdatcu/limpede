@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.6.0] - 2026-08-27
+
+### 📖 Unit Grammar Guidebooks on the Skill Tree
+
+#### 📖 Unit Grammar Guidebooks (`GuidebookSheet` & `GuidebookService`)
+- **Direct Skill Tree Access**: Placed a dedicated **Guidebook 📖** button on every Unit Header banner across the learning path.
+- **Pedagogical Rule Breakdowns**: Curated grammar explanations for each unit level (A1 to B2), including formal vs. informal distinctions, noun genders, and auxiliary verbs.
+- **Interactive Key Phrases**: Curated phrase cards with instant audio pronunciation in both standard rate (🔊) and slow-speed Turtle Mode (🐢).
+- **Verb Conjugation Tables**: Formatted Material tables displaying clear pronoun-to-verb conjugations (e.g. *Ser*, *Estar*, *Être*, *Sein*, *A fi*, *Essere*).
+- **Grammar Tips & Pitfall Warnings**: Highlighted callout boxes for common language learner mistakes.
+
+---
+
 ## [v1.5.0] - 2026-08-27
 
 ### ⏰ Local Study Reminders & Streak Freeze Enhancements
