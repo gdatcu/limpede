@@ -4,6 +4,38 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.3.0] - 2026-08-27
+
+### 🏆 Weekly Tiered Leagues, Limpede Droplets (Gems), Streak Freezes & Daily Quests
+
+#### 🏟️ Weekly Tiered Leagues (30-Person Cohorts)
+- **Competitive Tiers**: Introduced 5 progressive tiers: 🥉 **Bronze**, 🥈 **Silver**, 🥇 **Gold**, 🔮 **Obsidian**, and 💎 **Diamond**.
+- **Promotion & Relegation Mechanics**:
+  - 🟢 **Promotion Zone (Ranks 1–7)**: Top 7 learners promote to the next league tier.
+  - ⚪ **Safety Zone (Ranks 8–25)**: Learners maintain their current league tier.
+  - 🔴 **Demotion Zone (Ranks 26–30)**: Bottom 5 learners relegate to the lower tier (relegation disabled in Bronze).
+- **Weekly Sunday Resets**: Cohorts cycle weekly at Sunday 23:59:59 UTC with live countdown timers and ranking indicators.
+- **Overhauled Leaderboard Screen**: Implemented dynamic tier header banners, zone dividers, and glowing active user card highlights.
+
+#### 💧 Limpede Droplets (In-App Currency) & Droplet Shop
+- **Droplet Earnings**: Learners earn droplets upon completing lessons (+5 💧), Daily Reviews (+10 💧), and claiming Daily Quests (+10–15 💧).
+- **Persistent Header Pill**: Added a tappable Droplet counter to the top AppBar across `HomeScreen` and `ProfileScreen`.
+- **Droplet Shop (`GemShopSheet`)**: Bottom sheet modal for equipping **Streak Freezes** (100 💧) and purchasing **Full Heart Refills** (50 💧).
+
+#### 🧊 Streak Freeze Protection System
+- **Streak Preservation**: Equipping a Streak Freeze (max inventory 2) automatically shields a user's streak when a single day of practice is missed.
+- **Smart Consumption**: If `differenceInDays == 2`, consumes 1 freeze and increments the streak uninterrupted.
+
+#### 🎯 Dynamic Daily Quests
+- **Rotating Daily Objectives**:
+  1. 📖 *Daily Review Mastery* (Complete 2 SRS reviews).
+  2. 🎯 *Flawless Accuracy* (Score 90%+ in any standard lesson).
+  3. ⚡ *XP Powerhouse* (Earn 50 XP in a single day).
+- **Daily Auto-Reset**: Automatically refreshes at local midnight (`yyyy-MM-dd` date key).
+- **Interactive Daily Quests Card**: Embedded on `HomeScreen` with smooth progress bars, checkmarks, and celebratory reward claiming.
+
+---
+
 ## [v1.2.0] - 2026-08-26
 
 ### 🧹 Complete Removal of AI Assistant & Gemini Dependencies

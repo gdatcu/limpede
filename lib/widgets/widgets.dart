@@ -3,4 +3,6 @@ export 'custom_lesson_button.dart';
 export 'sentence_builder_widget.dart';
 export 'matching_pairs_widget.dart';
 export 'skill_tree_node.dart';
+export 'daily_quests_card.dart';
+export 'gem_shop_sheet.dart';
 

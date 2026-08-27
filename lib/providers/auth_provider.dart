@@ -34,15 +34,17 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> completeLesson({
     required String topic,
     int xpEarned = 25,
+    bool isReview = false,
   }) async {
     final user = state.value;
-    if (user == null) return;
+    final userId = user?.id ?? 'guest_local';
 
     final supabase = ref.read(supabaseServiceProvider);
     await supabase.completeLessonAndAwardXp(
-      userId: user.id,
+      userId: userId,
       topic: topic,
       xpEarned: xpEarned,
+      isReview: isReview,
     );
 
     ref.invalidate(currentUserProfileProvider);

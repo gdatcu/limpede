@@ -11,6 +11,10 @@ class UserProfile with _$UserProfile {
     String? avatarUrl,
     @Default(0) int xp,
     @Default(0) int streak,
+    @Default(50) int gems,
+    @Default(0) int streakFreezes,
+    @Default(0) int weeklyXp,
+    @Default('bronze') String leagueTier,
     DateTime? lastActiveAt,
     DateTime? createdAt,
   }) = _UserProfile;

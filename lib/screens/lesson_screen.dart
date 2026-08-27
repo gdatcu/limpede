@@ -123,6 +123,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
         _hasCompletedLesson = true;
         ref.read(srsLessonControllerProvider.notifier).finishLesson(
               topic: widget.lessonId,
+              heartsRemaining: _hearts,
             );
       }
     }

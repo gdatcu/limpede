@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/srs_models.dart';
 import '../providers/auth_provider.dart';
 import '../providers/course_provider.dart';
+import '../providers/league_provider.dart';
+import '../providers/quest_provider.dart';
 import '../services/services.dart';
 import '../services/srs_engine.dart';
 
@@ -171,9 +173,31 @@ class SrsLessonController extends _$SrsLessonController {
     ref.invalidate(dueSrsCountProvider);
   }
 
-  Future<void> finishLesson({required String topic}) async {
+  Future<void> finishLesson({
+    required String topic,
+    int heartsRemaining = 5,
+  }) async {
+    final currentDeck = state.value;
+    final isReview = currentDeck?.isSrsReviewSession ?? false;
+    final xpEarned = isReview ? 30 : 25;
+    final accuracyPercent = ((heartsRemaining / 5) * 100).round();
+
     final authNotifier = ref.read(authNotifierProvider.notifier);
-    await authNotifier.completeLesson(topic: topic, xpEarned: 25);
+    await authNotifier.completeLesson(
+      topic: topic,
+      xpEarned: xpEarned,
+      isReview: isReview,
+    );
+
+    // Record progress on daily quests
+    final questNotifier = ref.read(questControllerProvider.notifier);
+    await questNotifier.recordLessonProgress(
+      isReview: isReview,
+      accuracyPercent: accuracyPercent,
+      xpEarned: xpEarned,
+    );
+
     ref.invalidate(currentUserProfileProvider);
+    ref.invalidate(leagueControllerProvider);
   }
 }

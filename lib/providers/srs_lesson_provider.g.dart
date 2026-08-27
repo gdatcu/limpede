@@ -23,7 +23,7 @@ final dueSrsCountProvider = AutoDisposeFutureProvider<int>.internal(
 // ignore: unused_element
 typedef DueSrsCountRef = AutoDisposeFutureProviderRef<int>;
 String _$srsLessonControllerHash() =>
-    r'621f82b41c7adcb51e663c95858eac13b144a023';
+    r'd7ce4599034b3560c58305beff286d605b038dc0';
 
 /// See also [SrsLessonController].
 @ProviderFor(SrsLessonController)

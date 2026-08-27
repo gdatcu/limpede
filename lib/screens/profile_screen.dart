@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/league.dart';
 import '../providers/auth_provider.dart';
 import '../providers/mistake_provider.dart';
 import '../providers/settings_provider.dart';
+import '../widgets/gem_shop_sheet.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -23,7 +25,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile & Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Profile & Rewards', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -38,18 +40,21 @@ class ProfileScreen extends ConsumerWidget {
                 final username = profile?.username ?? 'Learner';
                 final xp = profile?.xp ?? 0;
                 final streak = profile?.streak ?? 1;
+                final gems = profile?.gems ?? 50;
+                final streakFreezes = profile?.streakFreezes ?? 0;
+                final tier = LeagueTier.fromString(profile?.leagueTier);
 
                 return Card(
-                  elevation: 2,
+                  elevation: 3,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(28),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(22.0),
                     child: Column(
                       children: [
                         CircleAvatar(
-                          radius: 40,
+                          radius: 44,
                           backgroundColor: theme.colorScheme.primaryContainer,
                           backgroundImage: profile?.avatarUrl != null
                               ? NetworkImage(profile!.avatarUrl!)
@@ -58,7 +63,7 @@ class ProfileScreen extends ConsumerWidget {
                               ? Text(
                                   username.isNotEmpty ? username[0].toUpperCase() : 'U',
                                   style: TextStyle(
-                                    fontSize: 32,
+                                    fontSize: 36,
                                     fontWeight: FontWeight.bold,
                                     color: theme.colorScheme.onPrimaryContainer,
                                   ),
@@ -72,57 +77,131 @@ class ProfileScreen extends ConsumerWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: tier.primaryColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: tier.primaryColor.withValues(alpha: 0.5)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(tier.emblemEmoji, style: const TextStyle(fontSize: 16)),
+                              const SizedBox(width: 6),
+                              Text(
+                                tier.displayName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: tier.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Stats Grid
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Column(
+                            Expanded(
+                              child: _buildStatTile(
+                                icon: Icons.local_fire_department,
+                                iconColor: Colors.orange,
+                                value: '$streak',
+                                label: 'Day Streak',
+                                theme: theme,
+                              ),
+                            ),
+                            Container(height: 40, width: 1, color: theme.colorScheme.outlineVariant),
+                            Expanded(
+                              child: _buildStatTile(
+                                icon: Icons.bolt,
+                                iconColor: Colors.amber.shade700,
+                                value: '$xp',
+                                label: 'Total XP',
+                                theme: theme,
+                              ),
+                            ),
+                            Container(height: 40, width: 1, color: theme.colorScheme.outlineVariant),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) => const GemShopSheet(),
+                                  );
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: _buildStatTile(
+                                  icon: Icons.water_drop,
+                                  iconColor: Colors.cyan,
+                                  value: '$gems',
+                                  label: 'Droplets 💧',
+                                  theme: theme,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 8),
+
+                        // Streak Freeze Status
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
                               children: [
-                                Row(
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.cyan.withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.ac_unit, color: Colors.cyan, size: 20),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Icon(Icons.local_fire_department,
-                                        color: Colors.orange, size: 24),
-                                    const SizedBox(width: 4),
+                                    const Text(
+                                      'Streak Freezes',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                    ),
                                     Text(
-                                      '$streak',
-                                      style: theme.textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.orange,
+                                      '$streakFreezes/2 Equipped 🧊',
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
-                                ),
-                                Text(
-                                  'Day Streak',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
                                 ),
                               ],
                             ),
-                            Container(height: 30, width: 1, color: theme.colorScheme.outlineVariant),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.bolt, color: Colors.amber, size: 24),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '$xp',
-                                      style: theme.textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.amber.shade700,
-                                      ),
-                                    ),
-                                  ],
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) => const GemShopSheet(),
+                                );
+                              },
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
-                                Text(
-                                  'Total XP',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
+                              ),
+                              icon: const Icon(Icons.shopping_bag_outlined, size: 16),
+                              label: const Text('Shop', style: TextStyle(fontSize: 12)),
                             ),
                           ],
                         ),
@@ -133,7 +212,7 @@ class ProfileScreen extends ConsumerWidget {
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // Mistake Review Card
             Card(
@@ -233,6 +312,40 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStatTile({
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+    required String label,
+    required ThemeData theme,
+  }) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: iconColor, size: 20),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: iconColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 }

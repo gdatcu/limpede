@@ -115,6 +115,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       orElse: () => 1,
     );
 
+    final userGems = userProfileAsync.maybeWhen(
+      data: (profile) => profile?.gems ?? 50,
+      orElse: () => 50,
+    );
+
     final nativeLang = courseState.nativeLanguage;
     final targetLang = courseState.targetLanguage;
 
@@ -175,13 +180,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
 
               // Streak Counter 🔥
               Row(
                 children: [
-                  const Icon(Icons.local_fire_department, color: Colors.orange, size: 22),
-                  const SizedBox(width: 4),
+                  const Icon(Icons.local_fire_department, color: Colors.orange, size: 20),
+                  const SizedBox(width: 3),
                   Text(
                     '$userStreak',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -191,13 +196,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
+
+              // Droplets / Gems Counter 💧 (Opens Shop)
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const GemShopSheet(),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.cyan.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.cyan.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.water_drop, color: Colors.cyan, size: 16),
+                      const SizedBox(width: 3),
+                      Text(
+                        '$userGems',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.cyan.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
 
               // Hearts Counter ❤️
               Row(
                 children: [
-                  const Icon(Icons.favorite, color: Colors.redAccent, size: 22),
-                  const SizedBox(width: 4),
+                  const Icon(Icons.favorite, color: Colors.redAccent, size: 20),
+                  const SizedBox(width: 3),
                   Text(
                     '5',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -207,12 +246,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
 
               // XP Counter ⚡
               Row(
                 children: [
-                  const Icon(Icons.bolt, color: Colors.amber, size: 22),
+                  const Icon(Icons.bolt, color: Colors.amber, size: 20),
                   const SizedBox(width: 2),
                   Text(
                     '$userXp',
@@ -373,6 +412,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
+          ),
+
+          // Daily Quests Card 🎯
+          const SliverToBoxAdapter(
+            child: DailyQuestsCard(),
           ),
 
           // Dynamic Duolingo Skill Tree Units

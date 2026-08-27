@@ -27,20 +27,47 @@ CREATE TABLE IF NOT EXISTS srs_review_items (
     CONSTRAINT unique_user_sentence UNIQUE (user_id, sentence_id)
 );
 
--- 3. High-Performance Indexes
+-- 3. User Profiles & Competitive Gamification
+CREATE TABLE IF NOT EXISTS user_profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    username TEXT NOT NULL,
+    avatar_url TEXT,
+    xp INTEGER NOT NULL DEFAULT 0,
+    streak INTEGER NOT NULL DEFAULT 0,
+    gems INTEGER NOT NULL DEFAULT 50,
+    streak_freezes INTEGER NOT NULL DEFAULT 0,
+    weekly_xp INTEGER NOT NULL DEFAULT 0,
+    league_tier TEXT NOT NULL DEFAULT 'bronze',
+    last_active_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. Completed Lessons History Table
+CREATE TABLE IF NOT EXISTS completed_lessons (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    topic TEXT NOT NULL,
+    xp_earned INTEGER NOT NULL DEFAULT 25,
+    completed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. High-Performance Indexes
 CREATE INDEX IF NOT EXISTS idx_sentence_pairs_topic_lang 
     ON sentence_pairs (topic_category, language_code);
 
 CREATE INDEX IF NOT EXISTS idx_srs_review_items_user_due 
     ON srs_review_items (user_id, next_review_date);
 
--- 4. Enable Row Level Security (RLS)
+CREATE INDEX IF NOT EXISTS idx_user_profiles_weekly_league 
+    ON user_profiles (league_tier, weekly_xp DESC);
+
+-- 6. Enable Row Level Security (RLS)
 ALTER TABLE sentence_pairs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE srs_review_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE completed_lessons ENABLE ROW LEVEL SECURITY;
 
--- 5. RLS Policies
--- Allow anyone (authenticated or guest) to read sentence pairs and seed new pairs
-DROP POLICY IF EXISTS "Public sentence pairs viewable by everyone" ON sentence_pairs;
+-- 7. RLS Policies
 DROP POLICY IF EXISTS "Public sentence pairs are viewable and manageable" ON sentence_pairs;
 CREATE POLICY "Public sentence pairs are viewable and manageable" 
     ON sentence_pairs FOR ALL 
@@ -50,6 +77,23 @@ CREATE POLICY "Public sentence pairs are viewable and manageable"
 DROP POLICY IF EXISTS "Users can manage their own SRS review items" ON srs_review_items;
 CREATE POLICY "Users can manage their own SRS review items" 
     ON srs_review_items FOR ALL 
+    USING (auth.uid() = user_id) 
+    WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Public user profiles are viewable by everyone" ON user_profiles;
+CREATE POLICY "Public user profiles are viewable by everyone" 
+    ON user_profiles FOR SELECT 
+    USING (true);
+
+DROP POLICY IF EXISTS "Users can manage their own profile" ON user_profiles;
+CREATE POLICY "Users can manage their own profile" 
+    ON user_profiles FOR ALL 
+    USING (auth.uid() = id) 
+    WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can manage their completed lessons" ON completed_lessons;
+CREATE POLICY "Users can manage their completed lessons" 
+    ON completed_lessons FOR ALL 
     USING (auth.uid() = user_id) 
     WITH CHECK (auth.uid() = user_id);
 

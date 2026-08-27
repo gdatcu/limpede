@@ -25,6 +25,10 @@ mixin _$UserProfile {
   String? get avatarUrl => throw _privateConstructorUsedError;
   int get xp => throw _privateConstructorUsedError;
   int get streak => throw _privateConstructorUsedError;
+  int get gems => throw _privateConstructorUsedError;
+  int get streakFreezes => throw _privateConstructorUsedError;
+  int get weeklyXp => throw _privateConstructorUsedError;
+  String get leagueTier => throw _privateConstructorUsedError;
   DateTime? get lastActiveAt => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -50,6 +54,10 @@ abstract class $UserProfileCopyWith<$Res> {
       String? avatarUrl,
       int xp,
       int streak,
+      int gems,
+      int streakFreezes,
+      int weeklyXp,
+      String leagueTier,
       DateTime? lastActiveAt,
       DateTime? createdAt});
 }
@@ -74,6 +82,10 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? avatarUrl = freezed,
     Object? xp = null,
     Object? streak = null,
+    Object? gems = null,
+    Object? streakFreezes = null,
+    Object? weeklyXp = null,
+    Object? leagueTier = null,
     Object? lastActiveAt = freezed,
     Object? createdAt = freezed,
   }) {
@@ -98,6 +110,22 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
           ? _value.streak
           : streak // ignore: cast_nullable_to_non_nullable
               as int,
+      gems: null == gems
+          ? _value.gems
+          : gems // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakFreezes: null == streakFreezes
+          ? _value.streakFreezes
+          : streakFreezes // ignore: cast_nullable_to_non_nullable
+              as int,
+      weeklyXp: null == weeklyXp
+          ? _value.weeklyXp
+          : weeklyXp // ignore: cast_nullable_to_non_nullable
+              as int,
+      leagueTier: null == leagueTier
+          ? _value.leagueTier
+          : leagueTier // ignore: cast_nullable_to_non_nullable
+              as String,
       lastActiveAt: freezed == lastActiveAt
           ? _value.lastActiveAt
           : lastActiveAt // ignore: cast_nullable_to_non_nullable
@@ -124,6 +152,10 @@ abstract class _$$UserProfileImplCopyWith<$Res>
       String? avatarUrl,
       int xp,
       int streak,
+      int gems,
+      int streakFreezes,
+      int weeklyXp,
+      String leagueTier,
       DateTime? lastActiveAt,
       DateTime? createdAt});
 }
@@ -146,6 +178,10 @@ class __$$UserProfileImplCopyWithImpl<$Res>
     Object? avatarUrl = freezed,
     Object? xp = null,
     Object? streak = null,
+    Object? gems = null,
+    Object? streakFreezes = null,
+    Object? weeklyXp = null,
+    Object? leagueTier = null,
     Object? lastActiveAt = freezed,
     Object? createdAt = freezed,
   }) {
@@ -170,6 +206,22 @@ class __$$UserProfileImplCopyWithImpl<$Res>
           ? _value.streak
           : streak // ignore: cast_nullable_to_non_nullable
               as int,
+      gems: null == gems
+          ? _value.gems
+          : gems // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakFreezes: null == streakFreezes
+          ? _value.streakFreezes
+          : streakFreezes // ignore: cast_nullable_to_non_nullable
+              as int,
+      weeklyXp: null == weeklyXp
+          ? _value.weeklyXp
+          : weeklyXp // ignore: cast_nullable_to_non_nullable
+              as int,
+      leagueTier: null == leagueTier
+          ? _value.leagueTier
+          : leagueTier // ignore: cast_nullable_to_non_nullable
+              as String,
       lastActiveAt: freezed == lastActiveAt
           ? _value.lastActiveAt
           : lastActiveAt // ignore: cast_nullable_to_non_nullable
@@ -191,6 +243,10 @@ class _$UserProfileImpl implements _UserProfile {
       this.avatarUrl,
       this.xp = 0,
       this.streak = 0,
+      this.gems = 50,
+      this.streakFreezes = 0,
+      this.weeklyXp = 0,
+      this.leagueTier = 'bronze',
       this.lastActiveAt,
       this.createdAt});
 
@@ -210,13 +266,25 @@ class _$UserProfileImpl implements _UserProfile {
   @JsonKey()
   final int streak;
   @override
+  @JsonKey()
+  final int gems;
+  @override
+  @JsonKey()
+  final int streakFreezes;
+  @override
+  @JsonKey()
+  final int weeklyXp;
+  @override
+  @JsonKey()
+  final String leagueTier;
+  @override
   final DateTime? lastActiveAt;
   @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, username: $username, avatarUrl: $avatarUrl, xp: $xp, streak: $streak, lastActiveAt: $lastActiveAt, createdAt: $createdAt)';
+    return 'UserProfile(id: $id, username: $username, avatarUrl: $avatarUrl, xp: $xp, streak: $streak, gems: $gems, streakFreezes: $streakFreezes, weeklyXp: $weeklyXp, leagueTier: $leagueTier, lastActiveAt: $lastActiveAt, createdAt: $createdAt)';
   }
 
   @override
@@ -231,6 +299,13 @@ class _$UserProfileImpl implements _UserProfile {
                 other.avatarUrl == avatarUrl) &&
             (identical(other.xp, xp) || other.xp == xp) &&
             (identical(other.streak, streak) || other.streak == streak) &&
+            (identical(other.gems, gems) || other.gems == gems) &&
+            (identical(other.streakFreezes, streakFreezes) ||
+                other.streakFreezes == streakFreezes) &&
+            (identical(other.weeklyXp, weeklyXp) ||
+                other.weeklyXp == weeklyXp) &&
+            (identical(other.leagueTier, leagueTier) ||
+                other.leagueTier == leagueTier) &&
             (identical(other.lastActiveAt, lastActiveAt) ||
                 other.lastActiveAt == lastActiveAt) &&
             (identical(other.createdAt, createdAt) ||
@@ -239,8 +314,19 @@ class _$UserProfileImpl implements _UserProfile {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, username, avatarUrl, xp,
-      streak, lastActiveAt, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      username,
+      avatarUrl,
+      xp,
+      streak,
+      gems,
+      streakFreezes,
+      weeklyXp,
+      leagueTier,
+      lastActiveAt,
+      createdAt);
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -265,6 +351,10 @@ abstract class _UserProfile implements UserProfile {
       final String? avatarUrl,
       final int xp,
       final int streak,
+      final int gems,
+      final int streakFreezes,
+      final int weeklyXp,
+      final String leagueTier,
       final DateTime? lastActiveAt,
       final DateTime? createdAt}) = _$UserProfileImpl;
 
@@ -281,6 +371,14 @@ abstract class _UserProfile implements UserProfile {
   int get xp;
   @override
   int get streak;
+  @override
+  int get gems;
+  @override
+  int get streakFreezes;
+  @override
+  int get weeklyXp;
+  @override
+  String get leagueTier;
   @override
   DateTime? get lastActiveAt;
   @override

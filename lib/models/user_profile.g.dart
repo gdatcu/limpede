@@ -13,6 +13,10 @@ _$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
       avatarUrl: json['avatarUrl'] as String?,
       xp: (json['xp'] as num?)?.toInt() ?? 0,
       streak: (json['streak'] as num?)?.toInt() ?? 0,
+      gems: (json['gems'] as num?)?.toInt() ?? 50,
+      streakFreezes: (json['streakFreezes'] as num?)?.toInt() ?? 0,
+      weeklyXp: (json['weeklyXp'] as num?)?.toInt() ?? 0,
+      leagueTier: json['leagueTier'] as String? ?? 'bronze',
       lastActiveAt: json['lastActiveAt'] == null
           ? null
           : DateTime.parse(json['lastActiveAt'] as String),
@@ -28,6 +32,10 @@ Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
       'avatarUrl': instance.avatarUrl,
       'xp': instance.xp,
       'streak': instance.streak,
+      'gems': instance.gems,
+      'streakFreezes': instance.streakFreezes,
+      'weeklyXp': instance.weeklyXp,
+      'leagueTier': instance.leagueTier,
       'lastActiveAt': instance.lastActiveAt?.toIso8601String(),
       'createdAt': instance.createdAt?.toIso8601String(),
     };

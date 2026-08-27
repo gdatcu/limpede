@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/league.dart';
 import '../models/srs_models.dart';
 import '../models/user_profile.dart';
 import '../utils/language_utils.dart';
@@ -289,6 +290,10 @@ class SupabaseService {
             avatarUrl: user.userMetadata?['avatar_url'] as String?,
             xp: 0,
             streak: 1,
+            gems: 50,
+            streakFreezes: 0,
+            weeklyXp: 0,
+            leagueTier: 'bronze',
             lastActiveAt: DateTime.now(),
             createdAt: DateTime.now(),
           );
@@ -314,6 +319,10 @@ class SupabaseService {
           avatarUrl: user.userMetadata?['avatar_url'] as String?,
           xp: 0,
           streak: 1,
+          gems: 50,
+          streakFreezes: 0,
+          weeklyXp: 0,
+          leagueTier: 'bronze',
         );
       }
       return null;
@@ -342,12 +351,20 @@ class SupabaseService {
         username: 'Alex (Friend)',
         xp: 210,
         streak: 4,
+        gems: 120,
+        streakFreezes: 1,
+        weeklyXp: 95,
+        leagueTier: 'bronze',
       ),
       const UserProfile(
         id: 'friend_2',
         username: 'Elena (Friend)',
         xp: 180,
         streak: 3,
+        gems: 90,
+        streakFreezes: 0,
+        weeklyXp: 80,
+        leagueTier: 'bronze',
       ),
       UserProfile(
         id: user?.id ?? 'you',
@@ -355,39 +372,68 @@ class SupabaseService {
         avatarUrl: user?.userMetadata?['avatar_url'] as String?,
         xp: 125,
         streak: 1,
+        gems: 50,
+        streakFreezes: 0,
+        weeklyXp: 45,
+        leagueTier: 'bronze',
       ),
       const UserProfile(
         id: 'friend_3',
         username: 'Marc (Friend)',
         xp: 95,
         streak: 2,
+        gems: 40,
+        streakFreezes: 0,
+        weeklyXp: 30,
+        leagueTier: 'bronze',
       ),
     ];
   }
 
   Future<void> upsertUserProfile(UserProfile profile) async {
-    await _client.from('user_profiles').upsert({
+    final payload = {
       'id': profile.id,
       'username': profile.username,
       'avatar_url': profile.avatarUrl,
       'xp': profile.xp,
       'streak': profile.streak,
+      'gems': profile.gems,
+      'streak_freezes': profile.streakFreezes,
+      'weekly_xp': profile.weeklyXp,
+      'league_tier': profile.leagueTier,
       'last_active_at': (profile.lastActiveAt ?? DateTime.now()).toIso8601String(),
-    });
+    };
+
+    if (!_isValidUuid(profile.id)) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('guest_profile', profile.toJson().toString());
+      return;
+    }
+
+    try {
+      await _client.from('user_profiles').upsert(payload);
+    } catch (e) {
+      debugPrint('Notice upserting user profile: $e');
+    }
   }
 
   Future<void> completeLessonAndAwardXp({
     required String userId,
     required String topic,
     int xpEarned = 25,
+    bool isReview = false,
   }) async {
     final profile = await fetchUserProfile(userId);
     final currentXp = profile?.xp ?? 0;
     final currentStreak = profile?.streak ?? 0;
+    final currentGems = profile?.gems ?? 50;
+    final currentStreakFreezes = profile?.streakFreezes ?? 0;
+    final currentWeeklyXp = profile?.weeklyXp ?? 0;
     final lastActive = profile?.lastActiveAt;
 
     final now = DateTime.now();
     int newStreak = currentStreak;
+    int newStreakFreezes = currentStreakFreezes;
 
     if (lastActive == null) {
       newStreak = 1;
@@ -395,6 +441,11 @@ class SupabaseService {
       final differenceInDays = now.difference(lastActive).inDays;
       if (differenceInDays == 1) {
         newStreak += 1;
+      } else if (differenceInDays == 2 && currentStreakFreezes > 0) {
+        // Protected by Streak Freeze! 🧊
+        newStreakFreezes = (currentStreakFreezes - 1).clamp(0, 2);
+        newStreak += 1;
+        debugPrint('🧊 Streak freeze consumed! Streak preserved at $newStreak.');
       } else if (differenceInDays > 1) {
         newStreak = 1;
       } else if (currentStreak == 0) {
@@ -402,34 +453,174 @@ class SupabaseService {
       }
     }
 
+    final gemsEarned = isReview ? 10 : 5;
+    final newGems = currentGems + gemsEarned;
     final newXp = currentXp + xpEarned;
+    final newWeeklyXp = currentWeeklyXp + xpEarned;
 
     await markTopicCompleted(userId: userId, topic: topic);
 
-    if (!_isValidUuid(userId)) {
-      debugPrint('Notice: Guest user ID "$userId" is not a valid UUID. Skipping Supabase XP write.');
-      return;
-    }
+    final updatedProfile = (profile ?? UserProfile(id: userId, username: 'Learner')).copyWith(
+      xp: newXp,
+      streak: newStreak,
+      gems: newGems,
+      streakFreezes: newStreakFreezes,
+      weeklyXp: newWeeklyXp,
+      lastActiveAt: now,
+    );
 
-    try {
-      await _client.from('user_profiles').upsert({
-        'id': userId,
-        'username': profile?.username ?? 'Learner',
-        'avatar_url': profile?.avatarUrl,
-        'xp': newXp,
-        'streak': newStreak,
-        'last_active_at': now.toIso8601String(),
-      });
+    await upsertUserProfile(updatedProfile);
 
-      await _client.from('completed_lessons').insert({
-        'user_id': userId,
-        'topic': topic,
-        'xp_earned': xpEarned,
-        'completed_at': now.toIso8601String(),
-      });
-    } catch (e) {
-      debugPrint('Notice completing lesson: $e');
+    if (_isValidUuid(userId)) {
+      try {
+        await _client.from('completed_lessons').insert({
+          'user_id': userId,
+          'topic': topic,
+          'xp_earned': xpEarned,
+          'completed_at': now.toIso8601String(),
+        });
+      } catch (e) {
+        debugPrint('Notice logging completed lesson: $e');
+      }
     }
   }
+
+  Future<bool> purchaseStreakFreeze(String userId) async {
+    final profile = await fetchUserProfile(userId);
+    if (profile == null) return false;
+
+    if (profile.gems < 100 || profile.streakFreezes >= 2) {
+      return false; // Not enough gems or already max capacity
+    }
+
+    final updated = profile.copyWith(
+      gems: profile.gems - 100,
+      streakFreezes: profile.streakFreezes + 1,
+    );
+    await upsertUserProfile(updated);
+    return true;
+  }
+
+  Future<bool> purchaseHeartRefill(String userId) async {
+    final profile = await fetchUserProfile(userId);
+    if (profile == null) return false;
+
+    if (profile.gems < 50) {
+      return false; // Not enough gems
+    }
+
+    final updated = profile.copyWith(
+      gems: profile.gems - 50,
+    );
+    await upsertUserProfile(updated);
+    return true;
+  }
+
+  Future<void> claimQuestReward({
+    required String userId,
+    required int gemReward,
+    required int xpReward,
+  }) async {
+    final profile = await fetchUserProfile(userId);
+    if (profile == null) return;
+
+    final updated = profile.copyWith(
+      gems: profile.gems + gemReward,
+      xp: profile.xp + xpReward,
+      weeklyXp: profile.weeklyXp + xpReward,
+    );
+    await upsertUserProfile(updated);
+  }
+
+  Future<List<LeagueMember>> fetchWeeklyLeagueCohort({
+    required String userId,
+    required LeagueTier tier,
+  }) async {
+    final List<LeagueMember> cohort = [];
+    final profile = await fetchUserProfile(userId);
+    final userWeeklyXp = profile?.weeklyXp ?? 45;
+    final username = profile?.username ?? 'You';
+
+    try {
+      if (_isValidUuid(userId)) {
+        final response = await _client
+            .from('user_profiles')
+            .select()
+            .eq('league_tier', tier.name)
+            .order('weekly_xp', ascending: false)
+            .limit(30);
+
+        final List<dynamic> data = response as List<dynamic>;
+        for (int i = 0; i < data.length; i++) {
+          final p = UserProfile.fromJson(data[i] as Map<String, dynamic>);
+          cohort.add(LeagueMember(
+            userId: p.id,
+            username: p.username,
+            avatarUrl: p.avatarUrl,
+            weeklyXp: p.weeklyXp,
+            rank: i + 1,
+            tier: tier,
+            isCurrentUser: p.id == userId,
+          ));
+        }
+      }
+    } catch (e) {
+      debugPrint('Notice querying Supabase league cohort: $e');
+    }
+
+    // If cohort is less than 30, deterministically generate competitive cohort peers
+    if (cohort.length < 30) {
+      final names = [
+        'Matei', 'Sophie', 'Lucas', 'Lina', 'David', 'Emma', 'Leo', 'Mia',
+        'Noah', 'Olivia', 'Arthur', 'Chloe', 'Gabriel', 'Zoe', 'Julian', 'Elena',
+        'Daniel', 'Sara', 'Thomas', 'Laura', 'Felix', 'Amelia', 'Liam', 'Nora',
+        'Victor', 'Eva', 'Hugo', 'Clara', 'Oscar', 'Maya'
+      ];
+
+      final currentInCohort = cohort.any((m) => m.userId == userId);
+
+      final List<Map<String, dynamic>> rawMembers = [];
+
+      for (int i = 0; i < 29; i++) {
+        final name = names[i % names.length];
+        // Generate believable distribution of scores around the user's score
+        final score = ((30 - i) * 12 + (i.hashCode % 15)).clamp(5, 500);
+        rawMembers.add({
+          'id': 'cohort_peer_$i',
+          'name': name,
+          'score': score,
+          'isUser': false,
+        });
+      }
+
+      if (!currentInCohort) {
+        rawMembers.add({
+          'id': userId,
+          'name': username,
+          'score': userWeeklyXp,
+          'isUser': true,
+        });
+      }
+
+      // Sort descending by score
+      rawMembers.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+      cohort.clear();
+      for (int r = 0; r < rawMembers.length && r < 30; r++) {
+        final item = rawMembers[r];
+        cohort.add(LeagueMember(
+          userId: item['id'] as String,
+          username: item['name'] as String,
+          weeklyXp: item['score'] as int,
+          rank: r + 1,
+          tier: tier,
+          isCurrentUser: item['isUser'] as bool,
+        ));
+      }
+    }
+
+    return cohort;
+  }
 }
+
 

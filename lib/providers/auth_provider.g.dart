@@ -42,7 +42,7 @@ final currentUserProfileProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserProfileRef = AutoDisposeFutureProviderRef<UserProfile?>;
-String _$authNotifierHash() => r'20870cbb0760371c6167773ebca1a08eebd62d1c';
+String _$authNotifierHash() => r'76ed789e1bb4da2a7f12aba9d8d7fb58bb41df23';
 
 /// See also [AuthNotifier].
 @ProviderFor(AuthNotifier)

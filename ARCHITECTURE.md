@@ -207,24 +207,42 @@ limpede/
 - **Dynamic UI Prompts** ([`localized_strings.dart`](lib/utils/localized_strings.dart)): Contextual headers (e.g., *"Translate into German:"* $\rightarrow$ *"Traduceți în germană:"* $\rightarrow$ *"Traduisez en allemand : "*), action buttons, and review prompts.
 - **Dynamic Unit & Node Dictionaries** ([`topic_translator.dart`](lib/utils/topic_translator.dart)): Visual node titles and unit headers translate into the user's native language on the frontend while strictly passing original raw English keys to the backend for 100% database query integrity.
 
-### 5. Multi-Modal Interactive Exercises
+### 7. Competitive Gamification, Weekly Leagues & Economy
+- **Weekly Tiered Leagues (30-Person Cohorts)**:
+  - **Tier Progression**: 🥉 Bronze ➔ 🥈 Silver ➔ 🥇 Gold ➔ 🔮 Obsidian ➔ 💎 Diamond.
+  - **Weekly Reset**: Every Sunday at midnight UTC (`23:59:59 UTC`).
+  - **Promotion & Demotion Zones**:
+    - 🟢 **Promotion Zone (Ranks 1–7)**: Top 7 promote to the next league tier.
+    - ⚪ **Safety Zone (Ranks 8–25)**: Retains current league tier.
+    - 🔴 **Demotion Zone (Ranks 26–30)**: Bottom 5 relegate to lower league tier (disabled in Bronze).
+  - **Dynamic Cohort Matching**: Realtime ranking syncing active users with deterministic simulated cohort peers when room is under 30.
+- **In-App Currency: Limpede Droplets / Gems (💧)**:
+  - Earned via standard lesson completions (+5 💧), Daily Reviews (+10 💧), and Daily Quests (+10–15 💧).
+  - Accessible via the persistent Droplet balance pill on the AppBar.
+- **Streak Freeze Protection (🧊)**:
+  - Users can purchase and equip up to 2 Streak Freezes from the Droplet Shop (100 💧 each).
+  - Automatically consumes 1 freeze and shields the user's streak if they miss a day of practice.
+- **Daily Quests Engine**:
+  - Dynamically resets every day at midnight local time (`quest_provider.dart`).
+  - Tracks 3 distinct rotating objectives:
+    1. *Daily Review Mastery* (Complete 2 SRS reviews).
+    2. *Flawless Accuracy* (Score 90%+ in any standard lesson).
+    3. *XP Powerhouse* (Earn 50 XP in a single day).
+  - Embedded interactive progress card on `HomeScreen` with instant reward claiming.
+
+### 8. Multi-Modal Interactive Exercises
 - **Multiple Choice Questions**: Dynamically generated 4-option questions with authentic distractors pulled from active sentence decks.
 - **Sentence Builder Drill** ([`sentence_builder_widget.dart`](lib/widgets/sentence_builder_widget.dart)): Interactive tap-to-assemble word tile banks with slotting animation.
 - **Matching Pairs Drill** ([`matching_pairs_widget.dart`](lib/widgets/matching_pairs_widget.dart)): Two-column vocabulary tap-to-match exercises with instant color-coded matching states.
 - **Native Pronunciation (TTS)** ([`tts_service.dart`](lib/services/tts_service.dart)): Audio speech pronunciation for target sentences across Spanish, French, German, Japanese, and English.
 
-### 6. Offline Resilience & Multi-Tier Fallbacks
+### 9. Offline Resilience & Multi-Tier Fallbacks
 - **Tier 1 (Remote Supabase)**: Realtime PostgreSQL query for active sentence pairs and user SRS backlog.
 - **Tier 2 (Local SharedPreferences Cache)**: Cached decks loaded instantly on app restart.
 - **Tier 3 (Local JSON Catalogs)**: Extensive offline Tatoeba sentence libraries in `assets/tatoeba_*_catalog.json`.
 - **Tier 4 (Hardcoded A1/A2 Practice Decks)**: Pure static native fallback sentences in [`language_utils.dart`](lib/utils/language_utils.dart) ensuring zero blank screens or placeholder strings.
 
-### 7. Gamification, Social Leaderboards & User Profiles
-- **XP Progression & Hearts System**: Users start lessons with 5 hearts, lose 1 per mistake, and earn 25+ XP on completion.
-- **Daily Streak Counter**: Streak calculations with timestamps stored locally and synced remotely.
-- **Supabase Realtime Leaderboard**: Live friend leaderboard ranked by total XP with podium avatars and rank badges.
-
-### 8. Automated CI/CD & In-App Auto-Update
+### 10. Automated CI/CD & In-App Auto-Update
 - **GitHub Actions Release Pipeline**: On pushing tags matching `v*`, CI automatically runs tests, builds `app-release.apk`, and creates a GitHub Release.
 - **In-App Updater** ([`update_service.dart`](lib/services/update_service.dart)): Automatically queries GitHub's latest release API on app launch and presents a one-tap download prompt if a new version is available.
 
@@ -241,37 +259,44 @@ CREATE TABLE IF NOT EXISTS public.sentence_pairs (
     language_code TEXT NOT NULL,       -- 'es', 'fr', 'de', 'ja', 'it', 'pt', 'ro', 'ru', 'tr'
     difficulty_level TEXT NOT NULL,    -- 'A1', 'A2', 'B1', 'B2', 'C1'
     topic_category TEXT NOT NULL,      -- e.g. 'Basics: Saying hello and goodbye'
+    grammar_notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Core Table: srs_review_items
 CREATE TABLE IF NOT EXISTS public.srs_review_items (
-    id TEXT PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    sentence_pair_id TEXT REFERENCES public.sentence_pairs(id) ON DELETE CASCADE,
+    sentence_id TEXT REFERENCES public.sentence_pairs(id) ON DELETE CASCADE,
     ease_factor FLOAT DEFAULT 2.5,
     interval_days INT DEFAULT 0,
-    repetitions INT DEFAULT 0,
+    consecutive_correct INT DEFAULT 0,
     next_review_date TIMESTAMPTZ DEFAULT NOW(),
-    last_reviewed_at TIMESTAMPTZ,
-    UNIQUE(user_id, sentence_pair_id)
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, sentence_id)
 );
 
--- User Profiles & Gamification
+-- User Profiles & Competitive Gamification
 CREATE TABLE IF NOT EXISTS public.user_profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    username TEXT,
+    username TEXT NOT NULL,
     avatar_url TEXT,
-    xp INT DEFAULT 0,
-    streak INT DEFAULT 0,
-    last_active_at TIMESTAMPTZ DEFAULT NOW()
+    xp INT NOT NULL DEFAULT 0,
+    streak INT NOT NULL DEFAULT 0,
+    gems INT NOT NULL DEFAULT 50,
+    streak_freezes INT NOT NULL DEFAULT 0,
+    weekly_xp INT NOT NULL DEFAULT 0,
+    league_tier TEXT NOT NULL DEFAULT 'bronze',
+    last_active_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- Lesson Completion Logs
+-- Completed Lessons History Table
 CREATE TABLE IF NOT EXISTS public.completed_lessons (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     topic TEXT NOT NULL,
+    xp_earned INT NOT NULL DEFAULT 25,
     completed_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
