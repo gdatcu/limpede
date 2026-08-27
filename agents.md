@@ -38,7 +38,8 @@
 2.  **Engine & Providers:** Implement local SRS scheduling logic and Supabase fetch repositories wrapped in Riverpod providers.
 3.  **UI Integration:** Connect screens to SRS providers with rich interactive exercise modalities (Multiple Choice, Sentence Builder, Matching Pairs).
 
-## 6. Documentation & Release Maintenance Protocol
-*   **Continuous Maintenance:** Whenever a new feature, bug fix, or architectural modification is added, you MUST update `README.md` and append/update an entry in `RELEASE_NOTES.md` under the version header (`## [vX.Y.Z] - YYYY-MM-DD`).
+## 6. Documentation & Architecture Protocol (MANDATORY)
+*   **Keep Architecture Synchronized:** Whenever you introduce architectural changes, add/modify features, update dependencies, change data models, or adjust state management flows, you **MUST** update [`ARCHITECTURE.md`](ARCHITECTURE.md) to reflect the exact current state of the system.
+*   **Continuous Maintenance:** Whenever a new feature, bug fix, or modification is added, you MUST update [`README.md`](README.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), and append/update an entry in [`RELEASE_NOTES.md`](RELEASE_NOTES.md) under the version header (`## [vX.Y.Z] - YYYY-MM-DD`).
 *   **Release Version Tags:** Release tags follow semantic versioning `vX.Y.Z` (e.g., `v1.0.0`, `v1.0.1`). Pushing a tag matching `v*` triggers the automated GitHub Release CI/CD workflow (`.github/workflows/release.yml`) which builds `app-release.apk` and publishes it to GitHub Releases.
 *   **Security & Secrets:** Never commit `.env` or generated secret files (`env_service.g.dart`). Maintain `.env.example` as a template for team members.

@@ -91,7 +91,8 @@ Limpede uses **GitHub Actions** for automated builds and releases.
 
 ---
 
-## 📝 Documenting Changes
+## 📝 Documentation & System Specifications
 
+- **[ARCHITECTURE.md](ARCHITECTURE.md)**: Comprehensive architectural blueprint, tech stack breakdown, and system data flows.
 - **[RELEASE_NOTES.md](RELEASE_NOTES.md)**: Contains detailed version release history.
 - **[AGENTS.md](AGENTS.md)**: Master instructions and workflow guidelines for AI coding assistants.
