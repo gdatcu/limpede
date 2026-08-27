@@ -219,9 +219,14 @@ limpede/
 - **In-App Currency: Limpede Droplets / Gems (💧)**:
   - Earned via standard lesson completions (+5 💧), Daily Reviews (+10 💧), and Daily Quests (+10–15 💧).
   - Accessible via the persistent Droplet balance pill on the AppBar.
-- **Streak Freeze Protection (🧊)**:
+- **Streak Freeze Protection & Badging (🧊)**:
   - Users can purchase and equip up to 2 Streak Freezes from the Droplet Shop (100 💧 each).
   - Automatically consumes 1 freeze and shields the user's streak if they miss a day of practice.
+  - Visual ice badge (🧊) rendered next to the streak flame in the `HomeScreen` header when equipped.
+- **Local Study Reminders System** ([`notification_service.dart`](lib/services/notification_service.dart) & [`reminder_provider.dart`](lib/providers/reminder_provider.dart)):
+  - Scheduled local daily repeating alarms via `flutter_local_notifications` and `timezone`.
+  - Configurable in `ProfileScreen` Settings with dynamic Material 3 TimePicker.
+  - Generates streak-aware, motivating push notifications to sustain daily habits.
 - **Daily Quests Engine**:
   - Dynamically resets every day at midnight local time (`quest_provider.dart`).
   - Tracks 3 distinct rotating objectives:

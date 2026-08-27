@@ -120,6 +120,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       orElse: () => 50,
     );
 
+    final userStreakFreezes = userProfileAsync.maybeWhen(
+      data: (profile) => profile?.streakFreezes ?? 0,
+      orElse: () => 0,
+    );
+
     final nativeLang = courseState.nativeLanguage;
     final targetLang = courseState.targetLanguage;
 
@@ -182,19 +187,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const SizedBox(width: 10),
 
-              // Streak Counter 🔥
-              Row(
-                children: [
-                  const Icon(Icons.local_fire_department, color: Colors.orange, size: 20),
-                  const SizedBox(width: 3),
-                  Text(
-                    '$userStreak',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
+              // Streak Counter 🔥 with optional 🧊 Freeze Badge
+              GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        userStreakFreezes > 0
+                            ? '$userStreak-day streak active! ($userStreakFreezes/2 🧊 Streak Freezes equipped)'
+                            : '$userStreak-day streak active! Equip Streak Freezes in the shop to protect it.',
+                      ),
+                      duration: const Duration(seconds: 2),
                     ),
-                  ),
-                ],
+                  );
+                },
+                child: Row(
+                  children: [
+                    const Icon(Icons.local_fire_department, color: Colors.orange, size: 20),
+                    const SizedBox(width: 3),
+                    Text(
+                      '$userStreak',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    if (userStreakFreezes > 0) ...[
+                      const SizedBox(width: 2),
+                      const Text('🧊', style: TextStyle(fontSize: 12)),
+                    ],
+                  ],
+                ),
               ),
               const SizedBox(width: 10),
 

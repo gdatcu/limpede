@@ -6,6 +6,7 @@ import '../models/league.dart';
 import '../providers/auth_provider.dart';
 import '../providers/mistake_provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/reminder_provider.dart';
 import '../widgets/gem_shop_sheet.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -22,6 +23,11 @@ class ProfileScreen extends ConsumerWidget {
     final soundEnabled = soundAsync.value ?? true;
     final hapticEnabled = hapticAsync.value ?? true;
     final mistakes = mistakesAsync.value ?? [];
+    final reminderSettingsAsync = ref.watch(reminderSettingsNotifierProvider);
+    final reminderSettings = reminderSettingsAsync.maybeWhen(
+      data: (s) => s,
+      orElse: () => const ReminderSettingsState(isEnabled: true, hour: 19, minute: 30),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -244,11 +250,62 @@ class ProfileScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
             Text(
-              'Settings',
+              'Settings & Reminders',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 12),
+
+            // Daily Study Reminder Switch
+            Card(
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    secondary: const Icon(Icons.alarm_on_rounded, color: Colors.orange),
+                    title: const Text('Daily Study Reminder', style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: const Text('Get notified daily to practice and keep your streak alive'),
+                    value: reminderSettings.isEnabled,
+                    onChanged: (val) {
+                      ref.read(reminderSettingsNotifierProvider.notifier).toggle(val);
+                    },
+                  ),
+                  if (reminderSettings.isEnabled) ...[
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.access_time_rounded),
+                      title: const Text('Reminder Time'),
+                      trailing: Text(
+                        TimeOfDay(hour: reminderSettings.hour, minute: reminderSettings.minute).format(context),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(
+                            hour: reminderSettings.hour,
+                            minute: reminderSettings.minute,
+                          ),
+                        );
+                        if (picked != null) {
+                          ref
+                              .read(reminderSettingsNotifierProvider.notifier)
+                              .setTime(picked.hour, picked.minute);
+                        }
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
             const SizedBox(height: 12),
 
             // Sound Effects Switch

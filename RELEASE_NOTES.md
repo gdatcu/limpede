@@ -4,6 +4,21 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.5.0] - 2026-08-27
+
+### ⏰ Local Study Reminders & Streak Freeze Enhancements
+
+#### ⏰ Local Daily Study Reminders (`NotificationService` & `ReminderSettingsNotifier`)
+- **Scheduled Push Notifications**: Configured timezone-aware daily repeating alarms using `flutter_local_notifications` and `timezone`.
+- **Dynamic Time Picker**: Added a dedicated switch and Material 3 TimePicker in `ProfileScreen` Settings to schedule custom reminder times (e.g. 19:30).
+- **Streak-Aware Copy**: Delivers encouraging, contextual messages based on active streak count and target learning language.
+
+#### 🧊 Streak Freeze Visual Badging & Alerts
+- **Header Ice Badge**: Displays equipped Streak Freeze indicator (🧊) directly beside the streak flame in the `HomeScreen` header when protected (`streakFreezes > 0`).
+- **Informative Status**: Tapping the streak pill shows remaining freeze protection with quick shortcuts to the Droplet Shop.
+
+---
+
 ## [v1.4.0] - 2026-08-27
 
 ### 🎧 Multi-Sensory Exercise Modalities (Turtle Mode, Spoken Pronunciation, Word Hints & Listening Comprehension)

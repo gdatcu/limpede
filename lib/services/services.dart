@@ -7,5 +7,6 @@ export 'srs_engine.dart';
 export 'update_service.dart';
 export 'speech_service.dart';
 export 'dictionary_service.dart';
+export 'notification_service.dart';
 
 

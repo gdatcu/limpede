@@ -7,6 +7,7 @@ export 'topic_provider.dart';
 export 'course_provider.dart';
 export 'league_provider.dart';
 export 'quest_provider.dart';
+export 'reminder_provider.dart';
 
 
 
