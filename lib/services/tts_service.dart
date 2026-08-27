@@ -34,15 +34,28 @@ class TtsService {
   Future<void> speak({
     required String text,
     required String targetLanguage,
+    double speechRate = 0.45,
   }) async {
     try {
       await _initTts();
       final langCode = _getLanguageCode(targetLanguage);
       await _flutterTts.setLanguage(langCode);
+      await _flutterTts.setSpeechRate(speechRate);
       await _flutterTts.speak(text);
     } catch (e) {
       debugPrint('TTS Speak Error (handled gracefully): $e');
     }
+  }
+
+  Future<void> speakSlowly({
+    required String text,
+    required String targetLanguage,
+  }) async {
+    await speak(
+      text: text,
+      targetLanguage: targetLanguage,
+      speechRate: 0.22,
+    );
   }
 
   Future<void> stop() async {

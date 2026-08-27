@@ -5,4 +5,7 @@ export 'matching_pairs_widget.dart';
 export 'skill_tree_node.dart';
 export 'daily_quests_card.dart';
 export 'gem_shop_sheet.dart';
+export 'interactive_hint_sentence.dart';
+export 'pronunciation_exercise_widget.dart';
+export 'listening_exercise_widget.dart';
 

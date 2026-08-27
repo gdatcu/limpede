@@ -230,11 +230,14 @@ limpede/
     3. *XP Powerhouse* (Earn 50 XP in a single day).
   - Embedded interactive progress card on `HomeScreen` with instant reward claiming.
 
-### 8. Multi-Modal Interactive Exercises
-- **Multiple Choice Questions**: Dynamically generated 4-option questions with authentic distractors pulled from active sentence decks.
+### 8. Multi-Sensory Exercise Modalities
+- **🐢 Turtle Mode (0.5x Slow Audio)**: Secondary slow-speed pronunciation button calling `TtsService.speakSlowly()` at 0.22 speech rate for precise phonetic comprehension.
+- **🎙️ Spoken Pronunciation Drills** ([`pronunciation_exercise_widget.dart`](lib/widgets/pronunciation_exercise_widget.dart)): Interactive speech evaluation using `SpeechRecognitionService` with diacritic-normalized Levenshtein string distance and fuzzy word matching ($0-100\%$ accuracy meter).
+- **🔤 Tappable Word Hints (Tooltips)** ([`interactive_hint_sentence.dart`](lib/widgets/interactive_hint_sentence.dart)): Tokenizes sentence prompts into inline word spans with dashed underlines; tapping a word reveals its localized translation, part of speech, and lemma via `DictionaryService`.
+- **👂 Audio-Only Listening Comprehension** ([`listening_exercise_widget.dart`](lib/widgets/listening_exercise_widget.dart)): "Tap what you hear" drills where prompt text is concealed, auto-playing target TTS audio on mount with word-tile reconstruction.
 - **Sentence Builder Drill** ([`sentence_builder_widget.dart`](lib/widgets/sentence_builder_widget.dart)): Interactive tap-to-assemble word tile banks with slotting animation.
 - **Matching Pairs Drill** ([`matching_pairs_widget.dart`](lib/widgets/matching_pairs_widget.dart)): Two-column vocabulary tap-to-match exercises with instant color-coded matching states.
-- **Native Pronunciation (TTS)** ([`tts_service.dart`](lib/services/tts_service.dart)): Audio speech pronunciation for target sentences across Spanish, French, German, Japanese, and English.
+- **Multiple Choice Questions**: Dynamically generated 4-option questions with authentic distractors pulled from active sentence decks.
 
 ### 9. Offline Resilience & Multi-Tier Fallbacks
 - **Tier 1 (Remote Supabase)**: Realtime PostgreSQL query for active sentence pairs and user SRS backlog.

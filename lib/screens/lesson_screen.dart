@@ -87,14 +87,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     tts.speak(text: text, targetLanguage: language);
   }
 
-  void _handleAnswer(SentencePair pair, bool isReverseMode) {
-    if (_selectedOption == null) return;
+  void _speakSlowly(String text, String language) {
+    final tts = ref.read(ttsServiceProvider);
+    tts.speakSlowly(text: text, targetLanguage: language);
+  }
 
-    final String correctAnswer = isReverseMode ? pair.sourceText : pair.targetText;
-    final isCorrect = _selectedOption!.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
-
+  void _onModalityResult(bool isCorrect, SentencePair pair) {
     final feedback = ref.read(feedbackServiceProvider);
-
     setState(() {
       _hasSubmitted = true;
     });
@@ -115,6 +114,15 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
             grade: 0,
           );
     }
+  }
+
+  void _handleAnswer(SentencePair pair, bool isReverseMode) {
+    if (_selectedOption == null) return;
+
+    final String correctAnswer = isReverseMode ? pair.sourceText : pair.targetText;
+    final isCorrect = _selectedOption!.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
+
+    _onModalityResult(isCorrect, pair);
   }
 
   void _nextChallenge(int totalItems) {
@@ -231,136 +239,174 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Prompt Card
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primaryContainer,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  currentPair.difficultyLevel,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onPrimaryContainer,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.volume_up_rounded,
-                                  color: theme.colorScheme.primary,
-                                  size: 26,
-                                ),
-                                tooltip: 'Listen Pronunciation',
-                                onPressed: () => _speakText(promptText, promptSpeakerLang),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            headerText,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            promptText,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (currentPair.grammarNotes != null &&
-                              currentPair.grammarNotes!.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              'Hint: ${currentPair.grammarNotes}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.tertiary,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
-                        ],
+                  const SizedBox(height: 16),
+
+                  // Dynamic Modality Dispatcher
+                  if (_currentIndex % 3 == 1 && !_hasSubmitted) ...[
+                    // Modality 1: Listening Comprehension ("Tap what you hear")
+                    Expanded(
+                      child: ListeningExerciseWidget(
+                        targetSentence: isReverseMode ? currentPair.sourceText : currentPair.targetText,
+                        nativeTranslation: isReverseMode ? currentPair.targetText : currentPair.sourceText,
+                        languageCode: promptSpeakerLang,
+                        distractorWords: LanguageUtils.getFallbackDistractors(targetLang)
+                            .expand((s) => s.split(' '))
+                            .take(4)
+                            .toList(),
+                        onCompleted: (isCorrect) => _onModalityResult(isCorrect, currentPair),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Multiple Choice Options
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: _currentOptions.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, idx) {
-                        final option = _currentOptions[idx];
-                        final isSelected = _selectedOption == option;
-                        final isThisCorrect =
-                            option.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
-
-                        Color borderClr = theme.colorScheme.outlineVariant;
-                        Color bgClr = theme.colorScheme.surface;
-
-                        if (_hasSubmitted) {
-                          if (isThisCorrect) {
-                            borderClr = Colors.green;
-                            bgClr = Colors.green.withValues(alpha: 0.1);
-                          } else if (isSelected && !isThisCorrect) {
-                            borderClr = Colors.red;
-                            bgClr = Colors.red.withValues(alpha: 0.1);
-                          }
-                        } else if (isSelected) {
-                          borderClr = theme.colorScheme.primary;
-                          bgClr = theme.colorScheme.primaryContainer.withValues(alpha: 0.3);
-                        }
-
-                        return OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 18,
+                  ] else if (_currentIndex % 3 == 2 && !_hasSubmitted) ...[
+                    // Modality 2: Spoken Pronunciation Drill ("Speak this sentence")
+                    Expanded(
+                      child: PronunciationExerciseWidget(
+                        targetSentence: isReverseMode ? currentPair.sourceText : currentPair.targetText,
+                        nativeTranslation: isReverseMode ? currentPair.targetText : currentPair.sourceText,
+                        languageCode: promptSpeakerLang,
+                        onCompleted: (isCorrect) => _onModalityResult(isCorrect, currentPair),
+                      ),
+                    ),
+                  ] else ...[
+                    // Modality 0 (or Review Mode): Multiple Choice with Interactive Word Hints & Turtle Mode
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    currentPair.difficultyLevel,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.volume_up_rounded,
+                                    color: theme.colorScheme.primary,
+                                    size: 26,
+                                  ),
+                                  tooltip: 'Listen Pronunciation',
+                                  onPressed: () => _speakText(promptText, promptSpeakerLang),
+                                ),
+                                IconButton(
+                                  icon: const Text('🐢', style: TextStyle(fontSize: 22)),
+                                  tooltip: 'Turtle Mode (0.5x Slow)',
+                                  onPressed: () => _speakSlowly(promptText, promptSpeakerLang),
+                                ),
+                              ],
                             ),
-                            side: BorderSide(color: borderClr, width: 2),
-                            backgroundColor: bgClr,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                          ),
-                          onPressed: _hasSubmitted
-                              ? null
-                              : () => setState(() => _selectedOption = option),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              option,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            const SizedBox(height: 12),
+                            Text(
+                              headerText,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                          ),
-                        );
-                      },
+                            const SizedBox(height: 8),
+
+                            // Interactive Word Hints
+                            InteractiveHintSentence(
+                              text: promptText,
+                              languageCode: promptSpeakerLang,
+                              textStyle: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            if (currentPair.grammarNotes != null &&
+                                currentPair.grammarNotes!.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                'Hint: ${currentPair.grammarNotes}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.tertiary,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(height: 20),
+
+                    // Multiple Choice Options
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: _currentOptions.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, idx) {
+                          final option = _currentOptions[idx];
+                          final isSelected = _selectedOption == option;
+                          final isThisCorrect =
+                              option.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
+
+                          Color borderClr = theme.colorScheme.outlineVariant;
+                          Color bgClr = theme.colorScheme.surface;
+
+                          if (_hasSubmitted) {
+                            if (isThisCorrect) {
+                              borderClr = Colors.green;
+                              bgClr = Colors.green.withValues(alpha: 0.1);
+                            } else if (isSelected && !isThisCorrect) {
+                              borderClr = Colors.red;
+                              bgClr = Colors.red.withValues(alpha: 0.1);
+                            }
+                          } else if (isSelected) {
+                            borderClr = theme.colorScheme.primary;
+                            bgClr = theme.colorScheme.primaryContainer.withValues(alpha: 0.3);
+                          }
+
+                          return OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 18,
+                              ),
+                              side: BorderSide(color: borderClr, width: 2),
+                              backgroundColor: bgClr,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                            onPressed: _hasSubmitted
+                                ? null
+                                : () => setState(() => _selectedOption = option),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                option,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
 
                   // Feedback Banner & Action Buttons
                   if (_hasSubmitted) ...[
@@ -413,34 +459,35 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(18),
-                      backgroundColor: theme.colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                  if (_currentIndex % 3 == 0 || _hasSubmitted)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(18),
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: (!_hasSubmitted && _selectedOption == null)
+                          ? null
+                          : () {
+                              if (!_hasSubmitted) {
+                                _handleAnswer(currentPair, isReverseMode);
+                              } else {
+                                _nextChallenge(pairs.length);
+                              }
+                            },
+                      child: Text(
+                        !_hasSubmitted
+                            ? LocalizedStrings.getCheckAnswer(nativeLang)
+                            : LocalizedStrings.getContinue(nativeLang),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                    onPressed: _selectedOption == null
-                        ? null
-                        : () {
-                            if (!_hasSubmitted) {
-                              _handleAnswer(currentPair, isReverseMode);
-                            } else {
-                              _nextChallenge(pairs.length);
-                            }
-                          },
-                    child: Text(
-                      !_hasSubmitted
-                          ? LocalizedStrings.getCheckAnswer(nativeLang)
-                          : LocalizedStrings.getContinue(nativeLang),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             );

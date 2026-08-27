@@ -4,6 +4,28 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.4.0] - 2026-08-27
+
+### 🎧 Multi-Sensory Exercise Modalities (Turtle Mode, Spoken Pronunciation, Word Hints & Listening Comprehension)
+
+#### 🐢 Turtle Mode (0.5x Slow Audio Pronunciation)
+- **Slow Speech Rate**: Added dedicated turtle button (`🐢`) calling `TtsService.speakSlowly()` at `0.22` speech rate for clear, phonetic word pronunciation across prompt cards and listening drills.
+
+#### 🎙️ Spoken Pronunciation Drills (`PronunciationExerciseWidget`)
+- **Speech Recognition Matching**: Integrated `speech_to_text` with diacritic-normalized Levenshtein edit distance and fuzzy word token overlap.
+- **Visual Waveform & Accuracy Meter**: Live pulsing microphone feedback with dynamic accuracy percentage ($0-100\%$) and automatic pass threshold ($\ge 75\%$).
+- **Quiet Mode Support**: Includes "Can't speak now" skip option for public/quiet environments.
+
+#### 🔤 Tappable Word Hints & Inline Lemma Tooltips (`InteractiveHintSentence`)
+- **Interactive Word Spans**: All prompt sentences feature subtle dashed underlines beneath individual words.
+- **Instant Popover Hints**: Tapping any word opens an instant tooltip displaying its localized translation, part of speech, and lemma via `DictionaryService`.
+
+#### 👂 Audio-Only Listening Comprehension (`ListeningExerciseWidget`)
+- **"Tap What You Hear" Drills**: Conceals prompt text and auto-plays target TTS audio on card mount.
+- **Word Bank Reconstruction**: Learners assemble the sentence from interactive word tiles, with full text and native translation revealed upon check answer.
+
+---
+
 ## [v1.3.0] - 2026-08-27
 
 ### 🏆 Weekly Tiered Leagues, Limpede Droplets (Gems), Streak Freezes & Daily Quests
