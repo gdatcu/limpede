@@ -4,6 +4,18 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.10.0] - 2026-08-28
+
+### 🏆 Milestone Trophy Room & Achievement Badges
+
+#### 🏆 Trophy Room & Achievement Badges (`AchievementBadgeTile` & `AchievementNotifier`)
+- **Tiered Milestone Badges**: Added tiered achievements for *Flame Keeper* (streak), *XP Titan*, *Polyglot Mind*, *League Conqueror*, and *Golden Ear*.
+- **Progress Tracking & Stars**: Displays current/target stats, linear progress bars, and star tier ratings (⭐).
+- **In-App Droplet Claiming**: Unlocked achievements can be claimed with 1 tap, rewarding $+15$ to $+30$ Droplets 💧 directly to the learner's balance.
+- **Profile Showcase Gallery**: Embedded a dedicated **🏆 Trophy Room** section on `ProfileScreen`.
+
+---
+
 ## [v1.9.0] - 2026-08-28
 
 ### ⚡ Match Madness / Rapid-Fire Time Attack Blitz Mode

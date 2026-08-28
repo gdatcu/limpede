@@ -10,6 +10,8 @@ export 'quest_provider.dart';
 export 'reminder_provider.dart';
 export 'mistake_provider.dart';
 export 'match_madness_provider.dart';
+export 'achievement_provider.dart';
+
 
 
 

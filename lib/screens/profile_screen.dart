@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/league.dart';
+import '../providers/achievement_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/mistake_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/reminder_provider.dart';
-import '../widgets/gem_shop_sheet.dart';
+import '../widgets/widgets.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -19,10 +20,12 @@ class ProfileScreen extends ConsumerWidget {
     final soundAsync = ref.watch(soundSettingsNotifierProvider);
     final hapticAsync = ref.watch(hapticSettingsNotifierProvider);
     final mistakesAsync = ref.watch(mistakeNotifierProvider);
+    final achievementsAsync = ref.watch(achievementNotifierProvider);
 
     final soundEnabled = soundAsync.value ?? true;
     final hapticEnabled = hapticAsync.value ?? true;
     final mistakes = mistakesAsync.value ?? [];
+    final achievements = achievementsAsync.value ?? [];
     final reminderSettingsAsync = ref.watch(reminderSettingsNotifierProvider);
     final reminderSettings = reminderSettingsAsync.maybeWhen(
       data: (s) => s,
@@ -217,6 +220,41 @@ class ProfileScreen extends ConsumerWidget {
                 );
               },
             ),
+
+            const SizedBox(height: 24),
+
+            // 🏆 Trophy Room & Achievements Showcase
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '🏆 Trophy Room',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '${achievements.where((a) => a.isUnlocked).length}/${achievements.length} Unlocked',
+                  style: TextStyle(
+                    color: Colors.amber.shade700,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            if (achievements.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else
+              for (final achievement in achievements)
+                AchievementBadgeTile(achievement: achievement),
 
             const SizedBox(height: 20),
 

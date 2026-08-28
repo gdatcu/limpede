@@ -241,6 +241,10 @@ limpede/
   - 60-second high-speed vocabulary matching challenge with dynamic tile replenishment.
   - Combo streak multiplier ($1.0\times \to 1.5\times \to 2.0\times \to 3.0\times$ Super Blitz) and droplet rewards.
   - Dedicated `BlitzBannerCard` launcher embedded on `HomeScreen`.
+- **🏆 Milestone Trophy Room & Achievement Badges** ([`achievement_badge_tile.dart`](lib/widgets/achievement_badge_tile.dart) & [`achievement_provider.dart`](lib/providers/achievement_provider.dart)):
+  - Tiered milestone badges (*Flame Keeper, XP Titan, Polyglot Mind, League Conqueror, Golden Ear*).
+  - Star tier indicators (⭐), linear progress tracking, and in-app Droplet reward claiming (+15 to +30 💧).
+  - Showcase gallery displayed on `ProfileScreen`.
 
 ### 8. Multi-Sensory Exercise Modalities
 - **🐢 Turtle Mode (0.5x Slow Audio)**: Secondary slow-speed pronunciation button calling `TtsService.speakSlowly()` at 0.22 speech rate for precise phonetic comprehension.
