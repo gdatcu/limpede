@@ -8,6 +8,9 @@ export 'course_provider.dart';
 export 'league_provider.dart';
 export 'quest_provider.dart';
 export 'reminder_provider.dart';
+export 'mistake_provider.dart';
+export 'match_madness_provider.dart';
+
 
 
 

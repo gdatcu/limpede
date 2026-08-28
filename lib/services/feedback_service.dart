@@ -12,6 +12,12 @@ class FeedbackService {
     this.hapticEnabled = true,
   }) : _audioPlayer = audioPlayer ?? AudioPlayer();
 
+  Future<void> playSelectionFeedback() async {
+    if (hapticEnabled) {
+      await HapticFeedback.selectionClick();
+    }
+  }
+
   Future<void> playCorrectFeedback() async {
     if (hapticEnabled) {
       await HapticFeedback.lightImpact();

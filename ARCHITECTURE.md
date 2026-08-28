@@ -237,6 +237,10 @@ limpede/
 - **Mistakes Inbox & Smart Review Workout** ([`mistakes_inbox_card.dart`](lib/widgets/mistakes_inbox_card.dart) & [`mistake_provider.dart`](lib/providers/mistake_provider.dart)):
   - Dedicated Mistakes Inbox card on `HomeScreen` tracking all unresolved sentence errors (Grade $< 3$).
   - One-tap "Start Workout" launcher that starts a dedicated error-repair session in `LessonScreen` to reinforce learning and clear the inbox.
+- **⚡ Match Madness / Rapid-Fire Time Attack Blitz** ([`match_madness_screen.dart`](lib/screens/match_madness_screen.dart) & [`match_madness_provider.dart`](lib/providers/match_madness_provider.dart)):
+  - 60-second high-speed vocabulary matching challenge with dynamic tile replenishment.
+  - Combo streak multiplier ($1.0\times \to 1.5\times \to 2.0\times \to 3.0\times$ Super Blitz) and droplet rewards.
+  - Dedicated `BlitzBannerCard` launcher embedded on `HomeScreen`.
 
 ### 8. Multi-Sensory Exercise Modalities
 - **🐢 Turtle Mode (0.5x Slow Audio)**: Secondary slow-speed pronunciation button calling `TtsService.speakSlowly()` at 0.22 speech rate for precise phonetic comprehension.

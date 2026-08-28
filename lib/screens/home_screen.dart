@@ -448,6 +448,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: MistakesInboxCard(),
           ),
 
+          // Match Madness Blitz Banner ⚡
+          const SliverToBoxAdapter(
+            child: BlitzBannerCard(),
+          ),
+
           // Dynamic Duolingo Skill Tree Units
           topicUnitsAsync.when(
             loading: () => const SliverToBoxAdapter(

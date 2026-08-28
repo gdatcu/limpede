@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.9.0] - 2026-08-28
+
+### ⚡ Match Madness / Rapid-Fire Time Attack Blitz Mode
+
+#### ⚡ 60-Second Match Madness Arena (`MatchMadnessScreen` & `MatchMadnessController`)
+- **60-Second Countdown Timer**: High-energy circular timer with dynamic color shifting (Green $\to$ Orange $\to$ Red).
+- **Dynamic Tile Replenishment**: Two 5-card columns of vocabulary pairs that instantly replenish from the active language deck upon successful match.
+- **Combo Multipliers**: Escalating combo streak bonuses ($1.0\times \to 1.5\times \to 2.0\times \to 3.0\times$ Super Blitz) with haptic feedback.
+- **In-App Droplet Rewards**: Win bonus Droplets 💧 and league XP based on speed and total matches made.
+- **Home Screen Launcher**: Dedicated `BlitzBannerCard` placed on the Home Tab for instant 1-tap game launching.
+
+---
+
 ## [v1.8.0] - 2026-08-28
 
 ### 🎯 Mistakes Inbox & Smart Review Workout

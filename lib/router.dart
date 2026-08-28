@@ -75,6 +75,12 @@ final GoRouter router = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: '/match-madness',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MatchMadnessScreen();
+      },
+    ),
   ],
 );
 
