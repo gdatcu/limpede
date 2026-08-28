@@ -443,6 +443,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: DailyQuestsCard(),
           ),
 
+          // Friend Quest & Shared Streak Duo 👥🔥
+          const SliverToBoxAdapter(
+            child: FriendQuestCard(),
+          ),
+
           // Mistakes Inbox Card ♥️
           const SliverToBoxAdapter(
             child: MistakesInboxCard(),

@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'memory_analytics_provider.dart';
+part of 'friend_quest_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$memoryAnalyticsNotifierHash() =>
-    r'681435b7db3d37d52d486226b6c94f76a5bb34c3';
+String _$friendQuestNotifierHash() =>
+    r'03590953d5b90eabfa72c92feaa1c3f060e7d1e1';
 
-/// See also [MemoryAnalyticsNotifier].
-@ProviderFor(MemoryAnalyticsNotifier)
-final memoryAnalyticsNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    MemoryAnalyticsNotifier, MemoryAnalytics>.internal(
-  MemoryAnalyticsNotifier.new,
-  name: r'memoryAnalyticsNotifierProvider',
+/// See also [FriendQuestNotifier].
+@ProviderFor(FriendQuestNotifier)
+final friendQuestNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<FriendQuestNotifier, FriendQuest>.internal(
+  FriendQuestNotifier.new,
+  name: r'friendQuestNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$memoryAnalyticsNotifierHash,
+      : _$friendQuestNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$MemoryAnalyticsNotifier = AutoDisposeAsyncNotifier<MemoryAnalytics>;
+typedef _$FriendQuestNotifier = AutoDisposeAsyncNotifier<FriendQuest>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -4,6 +4,19 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.12.0] - 2026-08-28
+
+### 👥 Friend Quests & Shared Streak Duos
+
+#### 👥 Cooperative Missions & Shared Streaks (`FriendQuestCard` & `FriendQuestNotifier`)
+- **Cooperative Weekly Missions**: Team up with study partners on joint language targets (e.g. *"Duo Dynamo: Complete 25 lessons together"*).
+- **Dual-Progress Visualizer**: Real-time split progress bar indicating individual and partner contributions.
+- **Shared Streak Flames (🔥)**: Celebrates unbroken multi-day streaks between learning partners.
+- **Interactive High Fives (✋)**: Send instant study encouragement nudges with haptic feedback.
+- **Joint Reward Claiming**: Earn $+25$ Droplets 💧 upon mission completion with 1-tap claim flow.
+
+---
+
 ## [v1.11.0] - 2026-08-28
 
 ### 📊 Memory Retention Analytics & Vocabulary Knowledge Heatmap

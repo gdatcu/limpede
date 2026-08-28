@@ -249,6 +249,10 @@ limpede/
   - Real-time SuperMemo-2 (SM-2) memory retention probability index (e.g. 94% 🧠).
   - Categorized breakdown of Mastered ($>21$d), Learning ($1-21$d), and Due cards from local SQLite.
   - CEFR Level distribution breakdown (A1, A2, B1, B2) and 7-day study activity chart.
+- **👥 Friend Quests & Shared Streak Duos** ([`friend_quest_card.dart`](lib/widgets/friend_quest_card.dart) & [`friend_quest_provider.dart`](lib/providers/friend_quest_provider.dart)):
+  - Collaborative weekly missions with dual-progress tracking (User + Partner contributions).
+  - Shared Streak Flames (🔥) with interactive "Send High Five ✋" haptic nudges.
+  - Joint Droplet reward claiming (+25 💧). Dedicated `FriendQuestCard` on `HomeScreen`.
 
 ### 8. Multi-Sensory Exercise Modalities
 - **🐢 Turtle Mode (0.5x Slow Audio)**: Secondary slow-speed pronunciation button calling `TtsService.speakSlowly()` at 0.22 speech rate for precise phonetic comprehension.
