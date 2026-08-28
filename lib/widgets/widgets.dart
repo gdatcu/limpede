@@ -12,6 +12,9 @@ export 'guidebook_sheet.dart';
 export 'mistakes_inbox_card.dart';
 export 'blitz_banner_card.dart';
 export 'achievement_badge_tile.dart';
+export 'memory_retention_card.dart';
+export 'weekly_xp_chart.dart';
+
 
 
 

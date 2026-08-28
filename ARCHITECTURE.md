@@ -245,6 +245,10 @@ limpede/
   - Tiered milestone badges (*Flame Keeper, XP Titan, Polyglot Mind, League Conqueror, Golden Ear*).
   - Star tier indicators (⭐), linear progress tracking, and in-app Droplet reward claiming (+15 to +30 💧).
   - Showcase gallery displayed on `ProfileScreen`.
+- **📊 Memory Retention Analytics & Knowledge Heatmap** ([`memory_retention_card.dart`](lib/widgets/memory_retention_card.dart), [`weekly_xp_chart.dart`](lib/widgets/weekly_xp_chart.dart) & [`memory_analytics_provider.dart`](lib/providers/memory_analytics_provider.dart)):
+  - Real-time SuperMemo-2 (SM-2) memory retention probability index (e.g. 94% 🧠).
+  - Categorized breakdown of Mastered ($>21$d), Learning ($1-21$d), and Due cards from local SQLite.
+  - CEFR Level distribution breakdown (A1, A2, B1, B2) and 7-day study activity chart.
 
 ### 8. Multi-Sensory Exercise Modalities
 - **🐢 Turtle Mode (0.5x Slow Audio)**: Secondary slow-speed pronunciation button calling `TtsService.speakSlowly()` at 0.22 speech rate for precise phonetic comprehension.

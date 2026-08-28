@@ -221,6 +221,13 @@ class ProfileScreen extends ConsumerWidget {
               },
             ),
 
+            const SizedBox(height: 20),
+
+            // 📊 Memory & Learning Analytics
+            const MemoryRetentionCard(),
+            const SizedBox(height: 6),
+            const WeeklyXpChart(),
+
             const SizedBox(height: 24),
 
             // 🏆 Trophy Room & Achievements Showcase

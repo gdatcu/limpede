@@ -4,6 +4,18 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.11.0] - 2026-08-28
+
+### 📊 Memory Retention Analytics & Vocabulary Knowledge Heatmap
+
+#### 📊 Memory Analytics & Weekly Activity (`MemoryRetentionCard` & `WeeklyXpChart`)
+- **SuperMemo-2 Memory Strength Meter**: Real-time calculated retention percentage (e.g. 94% 🧠) derived from local SM-2 review history.
+- **SRS Interval Breakdown**: Live counts for Mastered ($>21$ days), Learning ($1-21$ days), and Due Today cards.
+- **CEFR Vocabulary Knowledge Breakdown**: Instant categorization across CEFR levels A1, A2, B1, and B2.
+- **Weekly Study Activity Chart**: 7-day bar chart on `ProfileScreen` highlighting daily learning intensity and today's progress.
+
+---
+
 ## [v1.10.0] - 2026-08-28
 
 ### 🏆 Milestone Trophy Room & Achievement Badges

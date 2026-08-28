@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'achievement_provider.dart';
+part of 'memory_analytics_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$achievementNotifierHash() =>
-    r'8e4bc8943e178e216c24a934f4655b80bd4c61ef';
+String _$memoryAnalyticsNotifierHash() =>
+    r'780844ed8c4ba9150b993e29c4837fab3d6cee5d';
 
-/// See also [AchievementNotifier].
-@ProviderFor(AchievementNotifier)
-final achievementNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    AchievementNotifier, List<Achievement>>.internal(
-  AchievementNotifier.new,
-  name: r'achievementNotifierProvider',
+/// See also [MemoryAnalyticsNotifier].
+@ProviderFor(MemoryAnalyticsNotifier)
+final memoryAnalyticsNotifierProvider = AutoDisposeAsyncNotifierProvider<
+    MemoryAnalyticsNotifier, MemoryAnalytics>.internal(
+  MemoryAnalyticsNotifier.new,
+  name: r'memoryAnalyticsNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$achievementNotifierHash,
+      : _$memoryAnalyticsNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AchievementNotifier = AutoDisposeAsyncNotifier<List<Achievement>>;
+typedef _$MemoryAnalyticsNotifier = AutoDisposeAsyncNotifier<MemoryAnalytics>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

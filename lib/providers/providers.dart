@@ -11,6 +11,8 @@ export 'reminder_provider.dart';
 export 'mistake_provider.dart';
 export 'match_madness_provider.dart';
 export 'achievement_provider.dart';
+export 'memory_analytics_provider.dart';
+
 
 
 
