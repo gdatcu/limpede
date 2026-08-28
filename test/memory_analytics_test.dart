@@ -1,9 +1,13 @@
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:limpede/database/app_database.dart';
 import 'package:limpede/models/memory_analytics.dart';
 import 'package:limpede/models/user_profile.dart';
 import 'package:limpede/providers/auth_provider.dart';
 import 'package:limpede/providers/memory_analytics_provider.dart';
+import 'package:limpede/providers/srs_lesson_provider.dart';
+import 'package:limpede/services/sync_engine_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +31,10 @@ void main() {
     });
 
     test('Computes memory analytics from user profile', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      final syncEngine = SyncEngineService(db: db);
+      addTearDown(db.close);
+
       const user = UserProfile(
         id: 'test_user',
         username: 'Alex',
@@ -37,6 +45,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           currentUserProfileProvider.overrideWith((ref) => user),
+          syncEngineServiceProvider.overrideWithValue(syncEngine),
         ],
       );
       addTearDown(container.dispose);
@@ -51,3 +60,4 @@ void main() {
     });
   });
 }
+

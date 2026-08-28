@@ -4,6 +4,16 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.12.2] - 2026-08-28
+
+### 🛠️ Test Suite & CI Build Stability
+
+#### 🗄️ In-Memory SQLite Provider Test Override
+- **CI Test Fix (`memory_analytics_test.dart`)**: Overrode `syncEngineServiceProvider` with an isolated in-memory Drift database (`NativeDatabase.memory()`), resolving `MissingPluginException` on `path_provider` in headless / CI environments.
+- **Suite Verification**: All 37 unit and widget tests passing with 0 analyzer lints.
+
+---
+
 ## [v1.12.1] - 2026-08-28
 
 ### 🌐 Cross-Platform & Flutter Web Support
