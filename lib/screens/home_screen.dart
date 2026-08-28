@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 import '../providers/course_provider.dart';
+import '../providers/mascot_state_controller.dart';
 import '../providers/settings_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../providers/topic_provider.dart';
@@ -125,6 +126,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       data: (profile) => profile?.streakFreezes ?? 0,
       orElse: () => 0,
     );
+
+    final mascotState = ref.watch(mascotStateNotifierProvider);
+    final activeMascot = mascotState.character;
 
     final nativeLang = courseState.nativeLanguage;
     final targetLang = courseState.targetLanguage;
@@ -286,12 +290,109 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              const SizedBox(width: 10),
+
+              // Active Mascot Companion Pill (Tap to switch!)
+              GestureDetector(
+                onTap: () => CompanionPickerSheet.show(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: activeMascot.primaryColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: activeMascot.primaryColor.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(activeMascot.emoji, style: const TextStyle(fontSize: 14)),
+                      const SizedBox(width: 4),
+                      Text(
+                        activeMascot.name,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: activeMascot.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
       body: CustomScrollView(
         slivers: [
+          // Active Companion Mascot Motivational Banner
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  side: BorderSide(
+                    color: activeMascot.primaryColor.withValues(alpha: 0.35),
+                    width: 1.5,
+                  ),
+                ),
+                color: theme.colorScheme.surface,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      MascotViewWidget(
+                        size: 68,
+                        showSpeechBubble: false,
+                        enableTapInteraction: true,
+                        onCustomTap: () {},
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '${activeMascot.name} ${activeMascot.emoji}',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const Spacer(),
+                                TextButton.icon(
+                                  onPressed: () => CompanionPickerSheet.show(context),
+                                  icon: const Icon(Icons.swap_horiz, size: 16),
+                                  label: Text(
+                                    nativeLang.toLowerCase().startsWith('ro') ? 'Schimbă' : 'Switch',
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                  style: TextButton.styleFrom(
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              mascotState.speechQuote ?? activeMascot.tagline,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // Update Available Banner (GitHub Release Auto-Update)
           if (updateInfoAsync.asData?.value != null &&
               updateInfoAsync.asData!.value.hasUpdate) ...[

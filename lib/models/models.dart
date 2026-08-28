@@ -4,4 +4,5 @@ export 'course.dart';
 export 'srs_models.dart';
 export 'league.dart';
 export 'quest.dart';
+export 'mascot_character.dart';
 

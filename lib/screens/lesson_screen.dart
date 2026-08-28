@@ -2,14 +2,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../models/srs_models.dart';
+import '../models/models.dart';
 import '../providers/course_provider.dart';
 import '../providers/feedback_provider.dart';
 import '../providers/lesson_provider.dart';
+import '../providers/mascot_state_controller.dart';
 import '../providers/mistake_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../utils/language_utils.dart';
 import '../utils/localized_strings.dart';
+import '../utils/mascot_dialogue_engine.dart';
 import '../utils/topic_translator.dart';
 import '../widgets/widgets.dart';
 
@@ -38,17 +40,30 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   bool _hasSubmitted = false;
   bool _hasCompletedLesson = false;
   List<String> _currentOptions = [];
+  int _comboStreak = 0;
+  DateTime _questionStartTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _questionStartTime = DateTime.now();
+      final courseState = ref.read(courseStateNotifierProvider);
+
       if (widget.isMistakesWorkout) {
+        ref.read(mascotStateNotifierProvider.notifier).triggerEvent(
+              MascotDialogueTrigger.mistakesWorkout,
+              nativeLanguage: courseState.nativeLanguage,
+            );
         final mistakes = ref.read(mistakeNotifierProvider).value ?? [];
         ref.read(srsLessonControllerProvider.notifier).loadMistakesDeck(
               mistakes: mistakes,
             );
       } else {
+        ref.read(mascotStateNotifierProvider.notifier).triggerEvent(
+              MascotDialogueTrigger.lessonStart,
+              nativeLanguage: courseState.nativeLanguage,
+            );
         ref.read(srsLessonControllerProvider.notifier).loadLessonDeck(
               topic: widget.lessonId,
               targetLanguage: widget.targetLanguage,
@@ -104,18 +119,29 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
 
   void _onModalityResult(bool isCorrect, SentencePair pair) {
     final feedback = ref.read(feedbackServiceProvider);
+    final courseState = ref.read(courseStateNotifierProvider);
+    final responseTime = DateTime.now().difference(_questionStartTime);
+
     setState(() {
       _hasSubmitted = true;
     });
 
     if (isCorrect) {
+      _comboStreak++;
       feedback.playCorrectFeedback();
       ref.read(mistakeNotifierProvider.notifier).resolveMistake(pair.id);
       ref.read(srsLessonControllerProvider.notifier).recordAnswer(
             sentencePair: pair,
             grade: 5,
           );
+      ref.read(mascotStateNotifierProvider.notifier).triggerAnswerResult(
+            isCorrect: true,
+            comboStreak: _comboStreak,
+            responseTime: responseTime,
+            nativeLanguage: courseState.nativeLanguage,
+          );
     } else {
+      _comboStreak = 0;
       feedback.playWrongFeedback();
       ref.read(mistakeNotifierProvider.notifier).recordMistake(pair);
       if (_hearts > 0) {
@@ -124,6 +150,12 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       ref.read(srsLessonControllerProvider.notifier).recordAnswer(
             sentencePair: pair,
             grade: 0,
+          );
+      ref.read(mascotStateNotifierProvider.notifier).triggerAnswerResult(
+            isCorrect: false,
+            comboStreak: 0,
+            responseTime: responseTime,
+            nativeLanguage: courseState.nativeLanguage,
           );
     }
   }
@@ -138,9 +170,16 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   }
 
   void _nextChallenge(int totalItems) {
+    _questionStartTime = DateTime.now();
+
     if (_currentIndex + 1 >= totalItems) {
       if (!_hasCompletedLesson) {
         _hasCompletedLesson = true;
+        final courseState = ref.read(courseStateNotifierProvider);
+        ref.read(mascotStateNotifierProvider.notifier).triggerEvent(
+              MascotDialogueTrigger.lessonComplete,
+              nativeLanguage: courseState.nativeLanguage,
+            );
         ref.read(srsLessonControllerProvider.notifier).finishLesson(
               topic: widget.lessonId,
               heartsRemaining: _hearts,
@@ -249,9 +288,17 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
 
-                  const SizedBox(height: 16),
+                  // Companion Mascot Interaction & Speech Bubble
+                  const Center(
+                    child: MascotViewWidget(
+                      size: 74,
+                      showSpeechBubble: true,
+                      enableTapInteraction: true,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   // Dynamic Modality Dispatcher
                   if (_currentIndex % 3 == 1 && !_hasSubmitted) ...[
@@ -404,7 +451,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                             ),
                             onPressed: _hasSubmitted
                                 ? null
-                                : () => setState(() => _selectedOption = option),
+                                : () {
+                                    setState(() => _selectedOption = option);
+                                    ref.read(mascotStateNotifierProvider.notifier).setMood(
+                                          MascotMood.anticipating,
+                                          resetAfter: const Duration(milliseconds: 1600),
+                                        );
+                                  },
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
@@ -478,25 +531,19 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
-                      onPressed: (!_hasSubmitted && _selectedOption == null)
-                          ? null
-                          : () {
-                              if (!_hasSubmitted) {
-                                _handleAnswer(currentPair, isReverseMode);
-                              } else {
-                                _nextChallenge(pairs.length);
-                              }
-                            },
+                      onPressed: _hasSubmitted
+                          ? () => _nextChallenge(pairs.length)
+                          : () => _handleAnswer(currentPair, isReverseMode),
                       child: Text(
-                        !_hasSubmitted
-                            ? LocalizedStrings.getCheckAnswer(nativeLang)
-                            : LocalizedStrings.getContinue(nativeLang),
+                        _hasSubmitted
+                            ? LocalizedStrings.getContinue(nativeLang)
+                            : LocalizedStrings.getCheckAnswer(nativeLang),
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
                           fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -586,6 +633,12 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const MascotViewWidget(
+              size: 110,
+              showSpeechBubble: true,
+              enableTapInteraction: true,
+            ),
+            const SizedBox(height: 16),
             const Icon(Icons.heart_broken_rounded, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
@@ -619,6 +672,12 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const MascotViewWidget(
+              size: 120,
+              showSpeechBubble: true,
+              enableTapInteraction: true,
+            ),
+            const SizedBox(height: 16),
             const Icon(Icons.stars_rounded, size: 80, color: Colors.amber),
             const SizedBox(height: 16),
             Text(

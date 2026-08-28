@@ -15,6 +15,8 @@ export 'achievement_badge_tile.dart';
 export 'memory_retention_card.dart';
 export 'weekly_xp_chart.dart';
 export 'friend_quest_card.dart';
+export 'mascot_view_widget.dart';
+export 'companion_picker_sheet.dart';
 
 
 

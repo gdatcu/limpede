@@ -4,6 +4,25 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.13.0] - 2026-08-28
+
+### ⚡💧 Multi-Mascot Companion System ("Pede" & Squad)
+
+#### 🌟 Interactive Study Companions (`MascotViewWidget` & `CompanionPickerSheet`)
+- **The Limpede Squad**: Introduced 5 unique companions with distinct visuals, colors, archetypes, and voices:
+  - **Pede ⚡💧** *(The Curious Spark - Default)*: Crystal clear focus, lightning recall, and balanced encouragement.
+  - **Nyx 🌙🔮** *(The Sarcastic Polyglot)*: Witty, sharp-tongued shadow amethyst sprite with half-lidded cool eyes and deadpan compliments.
+  - **Volta ⚡🔥** *(The Hype Dynamo)*: High-octane speedster celebrating fast answer times (<2.8s) and high combo streaks.
+  - **Kora 🌿💎** *(The Zen Sage)*: Serene emerald jade sprite delivering mindful, calming guidance on mistakes.
+  - **Boba 🫧🧁** *(The Cheerful Novice)*: Bouncy pink bubble sprite giving double high-fives and celebrating small wins.
+- **60–120 FPS Procedural Vector Engine**: Hardware-accelerated Flutter `CustomPainter` with fluid body geometries, glowing auras, orbiting spark particles, and real-time gaze tracking (eyes follow user touch/cursor movements).
+- **Tactile Touch Physics**: Spring-squish feedback on drag/taps, backflip jumps on celebrations, and dizzy spiral-eye spins on rapid tapping.
+- **Deterministic Heuristic Dialogue Engine**: 100% rule-based dialogue matrix tailored for streaks (3x, 5x, 10x), speed bonuses, mistakes, and playful taps in both English and Romanian.
+- **1-Tap Companion Switcher**: Browse all companions with live animation previews, read their taglines, and switch active study buddies anytime.
+- **Lesson & Home Integration**: Mascot companion perches above lesson prompts, responds dynamically during exercise interactions, and offers motivational quotes on the Skill Tree.
+
+---
+
 ## [v1.12.2] - 2026-08-28
 
 ### 🛠️ Test Suite & CI Build Stability
