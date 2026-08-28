@@ -4,6 +4,17 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.12.1] - 2026-08-28
+
+### 🌐 Cross-Platform & Flutter Web Support
+
+#### 🗄️ Drift WebAssembly & Universal SQLite Architecture (`AppDatabase`)
+- **Flutter Web Compatibility**: Resolved `dart:ffi` JS interop compilation limitations on web browsers.
+- **Drift Flutter Integration**: Adopted `drift_flutter` for unified multi-platform database connections across Android, iOS, Windows, macOS, Linux, and Web.
+- **WebAssembly Worker Setup**: Bundled official `sqlite3.wasm` and `drift_worker.js` for fast Origin Private File System (OPFS) and IndexedDB persistence in Chrome/Edge browsers.
+
+---
+
 ## [v1.12.0] - 2026-08-28
 
 ### 👥 Friend Quests & Shared Streak Duos
