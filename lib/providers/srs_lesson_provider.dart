@@ -6,7 +6,6 @@ import '../providers/course_provider.dart';
 import '../providers/league_provider.dart';
 import '../providers/quest_provider.dart';
 import '../services/services.dart';
-import '../services/srs_engine.dart';
 
 part 'srs_lesson_provider.g.dart';
 
@@ -27,9 +26,26 @@ class SrsLessonDeck {
 }
 
 @riverpod
+SyncEngineService syncEngineService(Ref ref) {
+  return SyncEngineService();
+}
+
+@riverpod
 Future<int> dueSrsCount(Ref ref) async {
   final userProfile = ref.watch(currentUserProfileProvider).asData?.value;
   final userId = userProfile?.id ?? 'local_user';
+  final courseState = ref.watch(courseStateNotifierProvider);
+  final syncEngine = ref.watch(syncEngineServiceProvider);
+
+  // Try local-first query
+  final localDue = await syncEngine.getDueReviewsLocal(
+    userId: userId,
+    languageCode: courseState.queryLanguageCode,
+  );
+  if (localDue.isNotEmpty) {
+    return localDue.length;
+  }
+
   final supabaseService = ref.watch(supabaseServiceProvider);
   final items = await supabaseService.fetchDueSrsItems(userId: userId);
   return items.length;
@@ -52,19 +68,22 @@ class SrsLessonController extends _$SrsLessonController {
       final userProfile = ref.read(currentUserProfileProvider).asData?.value;
       final userId = userProfile?.id ?? 'local_user';
       final supabaseService = ref.read(supabaseServiceProvider);
+      final syncEngine = ref.read(syncEngineServiceProvider);
       final courseState = ref.read(courseStateNotifierProvider);
 
-      // Query language code based on mode:
-      // isReverseMode == false (English -> Foreign): query targetLanguage code (e.g. 'de')
-      // isReverseMode == true (Foreign -> English): query nativeLanguage code (e.g. 'ro')
       final queryLangCode = courseState.queryLanguageCode;
 
-      // Fetch deterministic sentence pairs for selected topic (microlesson limit of 10)
+      // Fetch sentence pairs (microlesson limit of 10)
       List<SentencePair> pairs = await supabaseService.fetchSentencePairs(
         topicCategory: topic,
         languageCode: queryLangCode,
         limit: 10,
       );
+
+      // Persist fetched pairs into local SQLite
+      if (pairs.isNotEmpty) {
+        await syncEngine.saveSentencePairs(pairs);
+      }
 
       // Fetch due SRS items for current user
       final dueItems = await supabaseService.fetchDueSrsItems(userId: userId);
@@ -73,7 +92,6 @@ class SrsLessonController extends _$SrsLessonController {
       };
 
       if (isSrsReviewSession) {
-        // Build dedicated review deck using due sentence pairs for active query language
         List<SentencePair> reviewPairs = [];
         for (var srsItem in dueItems) {
           final pair = await supabaseService.fetchSentencePairById(srsItem.sentenceId);
@@ -82,7 +100,6 @@ class SrsLessonController extends _$SrsLessonController {
           }
         }
         if (reviewPairs.isNotEmpty) {
-          // Fill deck with extra practice pairs from general topic if due items < 5
           final practicePairs = await supabaseService.fetchSentencePairs(
             topicCategory: 'Basics: Saying hello and goodbye',
             languageCode: queryLangCode,
@@ -96,7 +113,6 @@ class SrsLessonController extends _$SrsLessonController {
           }
           pairs = combined;
         } else {
-          // If no due items exist, load general practice pairs for the active query language
           pairs = await supabaseService.fetchSentencePairs(
             topicCategory: 'Basics: Saying hello and goodbye',
             languageCode: queryLangCode,
@@ -104,7 +120,6 @@ class SrsLessonController extends _$SrsLessonController {
           );
         }
       } else if (dueItems.isNotEmpty) {
-        // Mix in due SRS items matching active query language ONLY
         final duePairsForTopic = <SentencePair>[];
         for (var srsItem in dueItems) {
           final pair = await supabaseService.fetchSentencePairById(srsItem.sentenceId);
@@ -137,8 +152,16 @@ class SrsLessonController extends _$SrsLessonController {
   }) async {
     final userProfile = ref.read(currentUserProfileProvider).asData?.value;
     final userId = userProfile?.id ?? 'local_user';
-    final supabaseService = ref.read(supabaseServiceProvider);
+    final syncEngine = ref.read(syncEngineServiceProvider);
 
+    // 1. Record local-first into Drift SQLite & queue background sync
+    await syncEngine.recordAnswerLocalFirst(
+      userId: userId,
+      pair: sentencePair,
+      grade: grade,
+    );
+
+    // 2. Update memory state
     final currentDeck = state.value;
     final existingItem = currentDeck?.existingSrsItems[sentencePair.id] ??
         SrsReviewItem(
@@ -155,8 +178,6 @@ class SrsLessonController extends _$SrsLessonController {
       item: existingItem,
       grade: grade,
     );
-
-    await supabaseService.upsertSrsReviewItem(updatedSrsItem);
 
     if (currentDeck != null) {
       final updatedMap = Map<String, SrsReviewItem>.from(currentDeck.existingSrsItems);

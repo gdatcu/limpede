@@ -9,6 +9,8 @@ export 'speech_service.dart';
 export 'dictionary_service.dart';
 export 'notification_service.dart';
 export 'guidebook_service.dart';
+export 'sync_engine_service.dart';
+
 
 
 

@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'router.dart';
 import 'services/env_service.dart';
 import 'services/notification_service.dart';
+import 'services/sync_engine_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,9 @@ void main() async {
 
   // Initialize local notifications and study reminders
   await NotificationService().initialize();
+
+  // Trigger background flush for any pending offline mutations
+  SyncEngineService().syncPendingQueue();
 
   runApp(
     const ProviderScope(

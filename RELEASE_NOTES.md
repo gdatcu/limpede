@@ -4,6 +4,21 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.7.0] - 2026-08-28
+
+### ⚡ Drift SQLite Local-First Offline Sync Engine
+
+#### 🗄️ Drift Relational SQLite Database (`AppDatabase` & `tables.dart`)
+- **Local-First Persistence**: Created relational SQLite tables (`LocalSentencePairs`, `LocalSrsItems`, `SyncQueueItems`) using `drift` and native SQLite.
+- **Instant Zero-Latency Reviews**: User responses and SM-2 interval calculations are computed and saved locally with 0ms network latency.
+
+#### 🔄 Background Sync Queue (`SyncEngineService`)
+- **Offline Mutation Queue**: Reviews completed in offline or airplane mode are queued into `SyncQueueItems`.
+- **Automatic Delta Synchronization**: Background synchronization flushes pending offline reviews to Supabase when network connectivity is restored.
+- **Initial Launch Sync**: App startup automatically triggers background sync to synchronize pending mutations.
+
+---
+
 ## [v1.6.0] - 2026-08-27
 
 ### 📖 Unit Grammar Guidebooks on the Skill Tree

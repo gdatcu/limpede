@@ -247,9 +247,12 @@ limpede/
 - **Matching Pairs Drill** ([`matching_pairs_widget.dart`](lib/widgets/matching_pairs_widget.dart)): Two-column vocabulary tap-to-match exercises with instant color-coded matching states.
 - **Multiple Choice Questions**: Dynamically generated 4-option questions with authentic distractors pulled from active sentence decks.
 
-### 9. Offline Resilience & Multi-Tier Fallbacks
-- **Tier 1 (Remote Supabase)**: Realtime PostgreSQL query for active sentence pairs and user SRS backlog.
-- **Tier 2 (Local SharedPreferences Cache)**: Cached decks loaded instantly on app restart.
+### 9. Drift SQLite Local-First Sync Engine & Offline Resilience
+- **Tier 1 (Drift SQLite Relational Database)** ([`app_database.dart`](lib/database/app_database.dart) & [`sync_engine_service.dart`](lib/services/sync_engine_service.dart)):
+  - **Local-First Architecture**: 100% of sentence pairs and user SRS reviews are stored, queried, and updated directly in local SQLite (`limpede.sqlite`).
+  - **Zero-Latency SRS Reviews**: User grades are recorded and calculated via SM-2 instantly with 0ms network latency.
+  - **Offline Mutation Queue (`SyncQueueItems`)**: Offline answers and updates are automatically queued and flushed asynchronously to remote Supabase in the background when connectivity is available.
+- **Tier 2 (Remote Supabase PostgreSQL Synchronization)**: Bidirectional cloud persistence for multi-device synchronization and league ranking.
 - **Tier 3 (Local JSON Catalogs)**: Extensive offline Tatoeba sentence libraries in `assets/tatoeba_*_catalog.json`.
 - **Tier 4 (Hardcoded A1/A2 Practice Decks)**: Pure static native fallback sentences in [`language_utils.dart`](lib/utils/language_utils.dart) ensuring zero blank screens or placeholder strings.
 

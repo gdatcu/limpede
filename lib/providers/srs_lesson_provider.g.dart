@@ -6,7 +6,25 @@ part of 'srs_lesson_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dueSrsCountHash() => r'c6fd9bc7daa4fc42cb4ca4bfccfa84eaf341b5c6';
+String _$syncEngineServiceHash() => r'60fb00b74a4c585fdac74997af3b54e6297fd217';
+
+/// See also [syncEngineService].
+@ProviderFor(syncEngineService)
+final syncEngineServiceProvider =
+    AutoDisposeProvider<SyncEngineService>.internal(
+  syncEngineService,
+  name: r'syncEngineServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$syncEngineServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SyncEngineServiceRef = AutoDisposeProviderRef<SyncEngineService>;
+String _$dueSrsCountHash() => r'9545a9c978bac77eb254929ff461ad5d8b249e46';
 
 /// See also [dueSrsCount].
 @ProviderFor(dueSrsCount)
@@ -23,7 +41,7 @@ final dueSrsCountProvider = AutoDisposeFutureProvider<int>.internal(
 // ignore: unused_element
 typedef DueSrsCountRef = AutoDisposeFutureProviderRef<int>;
 String _$srsLessonControllerHash() =>
-    r'd7ce4599034b3560c58305beff286d605b038dc0';
+    r'3b0b97055dad0687401f5473ba50d66d706fb079';
 
 /// See also [SrsLessonController].
 @ProviderFor(SrsLessonController)
