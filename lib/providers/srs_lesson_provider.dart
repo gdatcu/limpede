@@ -58,6 +58,22 @@ class SrsLessonController extends _$SrsLessonController {
     return const AsyncValue.loading();
   }
 
+  Future<void> loadMistakesDeck({
+    required List<SentencePair> mistakes,
+  }) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final courseState = ref.read(courseStateNotifierProvider);
+      return SrsLessonDeck(
+        topic: 'Mistakes Workout',
+        targetLanguage: courseState.targetLanguage,
+        sentencePairs: mistakes,
+        existingSrsItems: {},
+        isSrsReviewSession: false,
+      );
+    });
+  }
+
   Future<void> loadLessonDeck({
     required String topic,
     String? targetLanguage,

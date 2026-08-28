@@ -234,6 +234,9 @@ limpede/
     2. *Flawless Accuracy* (Score 90%+ in any standard lesson).
     3. *XP Powerhouse* (Earn 50 XP in a single day).
   - Embedded interactive progress card on `HomeScreen` with instant reward claiming.
+- **Mistakes Inbox & Smart Review Workout** ([`mistakes_inbox_card.dart`](lib/widgets/mistakes_inbox_card.dart) & [`mistake_provider.dart`](lib/providers/mistake_provider.dart)):
+  - Dedicated Mistakes Inbox card on `HomeScreen` tracking all unresolved sentence errors (Grade $< 3$).
+  - One-tap "Start Workout" launcher that starts a dedicated error-repair session in `LessonScreen` to reinforce learning and clear the inbox.
 
 ### 8. Multi-Sensory Exercise Modalities
 - **🐢 Turtle Mode (0.5x Slow Audio)**: Secondary slow-speed pronunciation button calling `TtsService.speakSlowly()` at 0.22 speech rate for precise phonetic comprehension.

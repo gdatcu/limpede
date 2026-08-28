@@ -24,7 +24,7 @@ final syncEngineServiceProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SyncEngineServiceRef = AutoDisposeProviderRef<SyncEngineService>;
-String _$dueSrsCountHash() => r'9545a9c978bac77eb254929ff461ad5d8b249e46';
+String _$dueSrsCountHash() => r'f1ad56c28910fb4e9fe2f09fa7e60e6844b0734b';
 
 /// See also [dueSrsCount].
 @ProviderFor(dueSrsCount)
@@ -41,7 +41,7 @@ final dueSrsCountProvider = AutoDisposeFutureProvider<int>.internal(
 // ignore: unused_element
 typedef DueSrsCountRef = AutoDisposeFutureProviderRef<int>;
 String _$srsLessonControllerHash() =>
-    r'3b0b97055dad0687401f5473ba50d66d706fb079';
+    r'78384bd31e0540a42b407235d4d93664297aedb7';
 
 /// See also [SrsLessonController].
 @ProviderFor(SrsLessonController)

@@ -4,6 +4,18 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.8.0] - 2026-08-28
+
+### 🎯 Mistakes Inbox & Smart Review Workout
+
+#### 🎯 Mistakes Inbox Card (`MistakesInboxCard` & `MistakeNotifier`)
+- **Home Screen Tracking**: Added an interactive Mistakes Inbox card on the Home Tab directly below Daily Quests.
+- **Dynamic State Display**: Visualizes active mistake count (e.g. *"3 phrases need a quick review"*) or celebratory *"Inbox Zero! Clean streak ✨"* state.
+- **Dedicated Smart Workout**: "Start Workout" button launches a specialized review deck isolating only failed cards until they are answered correctly and mastered.
+- **Automatic Resolution**: Correctly answering a previously failed sentence removes it from the Mistakes Inbox and updates SRS progress.
+
+---
+
 ## [v1.7.0] - 2026-08-28
 
 ### ⚡ Drift SQLite Local-First Offline Sync Engine

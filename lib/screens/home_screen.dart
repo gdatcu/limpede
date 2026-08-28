@@ -443,6 +443,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: DailyQuestsCard(),
           ),
 
+          // Mistakes Inbox Card ♥️
+          const SliverToBoxAdapter(
+            child: MistakesInboxCard(),
+          ),
+
           // Dynamic Duolingo Skill Tree Units
           topicUnitsAsync.when(
             loading: () => const SliverToBoxAdapter(

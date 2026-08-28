@@ -66,10 +66,12 @@ final GoRouter router = GoRouter(
         final lessonId = state.pathParameters['id'] ?? 'default';
         final targetLanguage = state.uri.queryParameters['language'] ?? 'Spanish';
         final isSrsReview = state.uri.queryParameters['isSrsReview'] == 'true';
+        final isMistakesWorkout = state.uri.queryParameters['isMistakesWorkout'] == 'true';
         return LessonScreen(
           lessonId: lessonId,
           targetLanguage: targetLanguage,
           isSrsReview: isSrsReview,
+          isMistakesWorkout: isMistakesWorkout,
         );
       },
     ),

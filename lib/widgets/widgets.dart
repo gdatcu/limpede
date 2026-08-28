@@ -9,5 +9,7 @@ export 'interactive_hint_sentence.dart';
 export 'pronunciation_exercise_widget.dart';
 export 'listening_exercise_widget.dart';
 export 'guidebook_sheet.dart';
+export 'mistakes_inbox_card.dart';
+
 
 

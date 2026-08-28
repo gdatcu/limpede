@@ -6,6 +6,7 @@ import '../models/srs_models.dart';
 import '../providers/course_provider.dart';
 import '../providers/feedback_provider.dart';
 import '../providers/lesson_provider.dart';
+import '../providers/mistake_provider.dart';
 import '../providers/srs_lesson_provider.dart';
 import '../utils/language_utils.dart';
 import '../utils/localized_strings.dart';
@@ -16,12 +17,14 @@ class LessonScreen extends ConsumerStatefulWidget {
   final String lessonId;
   final String targetLanguage;
   final bool isSrsReview;
+  final bool isMistakesWorkout;
 
   const LessonScreen({
     super.key,
     required this.lessonId,
     this.targetLanguage = 'Spanish',
     this.isSrsReview = false,
+    this.isMistakesWorkout = false,
   });
 
   @override
@@ -40,11 +43,18 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(srsLessonControllerProvider.notifier).loadLessonDeck(
-            topic: widget.lessonId,
-            targetLanguage: widget.targetLanguage,
-            isSrsReviewSession: widget.isSrsReview,
-          );
+      if (widget.isMistakesWorkout) {
+        final mistakes = ref.read(mistakeNotifierProvider).value ?? [];
+        ref.read(srsLessonControllerProvider.notifier).loadMistakesDeck(
+              mistakes: mistakes,
+            );
+      } else {
+        ref.read(srsLessonControllerProvider.notifier).loadLessonDeck(
+              topic: widget.lessonId,
+              targetLanguage: widget.targetLanguage,
+              isSrsReviewSession: widget.isSrsReview,
+            );
+      }
     });
   }
 
@@ -100,12 +110,14 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
 
     if (isCorrect) {
       feedback.playCorrectFeedback();
+      ref.read(mistakeNotifierProvider.notifier).resolveMistake(pair.id);
       ref.read(srsLessonControllerProvider.notifier).recordAnswer(
             sentencePair: pair,
             grade: 5,
           );
     } else {
       feedback.playWrongFeedback();
+      ref.read(mistakeNotifierProvider.notifier).recordMistake(pair);
       if (_hearts > 0) {
         setState(() => _hearts--);
       }
