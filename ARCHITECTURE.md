@@ -123,7 +123,7 @@ limpede/
 │   ├── audio/                     # Sound effects (correct, incorrect, level up)
 │   ├── icon/                      # Application icons
 │   ├── supabase_schema.sql        # Database schema, RLS policies, indexes, and initial seeds
-│   └── tatoeba_*_catalog.json     # Offline Tatoeba sentence catalogs (DE, ES, FR, IT, JA, PT, RO, RU, TR)
+│   └── tatoeba_*_catalog.json     # Offline Tatoeba sentence catalogs (DE, ES, FR, RO)
 ├── lib/
 │   ├── main.dart                  # Application entrypoint & Supabase initialization
 │   ├── router.dart                # GoRouter route declarations & auth redirect guard

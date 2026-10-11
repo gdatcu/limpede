@@ -46,13 +46,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       DropdownMenuItem(value: 'English', child: Text('🇬🇧 English')),
       DropdownMenuItem(value: 'French', child: Text('🇫🇷 French')),
       DropdownMenuItem(value: 'Spanish', child: Text('🇪🇸 Spanish')),
-      DropdownMenuItem(value: 'Italian', child: Text('🇮🇹 Italian')),
       DropdownMenuItem(value: 'Romanian', child: Text('🇷🇴 Romanian')),
-      DropdownMenuItem(value: 'Portuguese', child: Text('🇵🇹 Portuguese')),
-      DropdownMenuItem(value: 'Russian', child: Text('🇷🇺 Russian')),
-      DropdownMenuItem(value: 'Japanese', child: Text('🇯🇵 Japanese')),
     ];
   }
+
 
   @override
   Widget build(BuildContext context) {

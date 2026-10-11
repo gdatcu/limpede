@@ -4,6 +4,25 @@ All notable changes, version history, and new features for the Limpede project a
 
 ---
 
+## [v1.14.0] - 2026-10-11
+
+### 🧹 Database & Curriculum Optimization (Core Language Focus)
+
+#### 🗄️ Supabase Sentence Pairs Pruning & Performance Boost
+- **63% Database Reduction**: Safely pruned **1,253,770** unused secondary sentence pairs (`ru`, `it`, `pt`, `ja`) from the `sentence_pairs` table, shrinking the active curriculum from 1.98M to **732,313** high-quality rows.
+- **Zero Statement Timeouts**: Resolved Postgres execution timeouts on topic aggregations and exact count queries, significantly speeding up query execution for all active learners.
+
+#### 🌐 Symmetrical Core Language Support (`HomeScreen`)
+- **Streamlined Target Courses**: Aligned the target course selector in `HomeScreen` to symmetrically match the core language curriculum:
+  - 🇩🇪 **German**
+  - 🇬🇧 **English** (Bi-directional Reverse Mode)
+  - 🇫🇷 **French**
+  - 🇪🇸 **Spanish**
+  - 🇷🇴 **Romanian**
+- **468 MB Repository Bloat Removed**: Purged legacy unbundled offline Tatoeba catalog JSON files (`tr`, `ru`, `it`, `pt`, `ja`) and extraction artifacts, dramatically reducing disk footprint and keeping only active core catalogs (`de`, `es`, `fr`, `ro`).
+
+---
+
 ## [v1.13.0] - 2026-08-28
 
 ### ⚡💧 Multi-Mascot Companion System ("Pede" & Squad)
